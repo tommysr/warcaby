@@ -260,13 +260,15 @@ class Game{
     }
 
     refresh(){
-
-        for(let i = 0; i < this.scene.children.length && this.scene.children[i]; i++)
-            if(i.geometry.type == "CylinderGeometry")
-                this.scene.remove(i)
-            else
-                i--
-        
-        this.dajPionki()
+        var c = 0;
+        while (this.scene.children[c]) {
+            if (this.scene.children[c].geometry.type == "CylinderGeometry") {
+                this.scene.remove(this.scene.children[c])
+            }
+            else {
+                c++;
+            }
+        }
+        this.dajPionki();
     }
 }
