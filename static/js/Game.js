@@ -152,7 +152,7 @@ class Game{
     }
 
 
-    pickUp(el, intersects){
+    pickUp(el){
 
 
         var geometry = 0, pole = 0, czyste = 0, krok = 0
@@ -261,9 +261,11 @@ class Game{
 
     refresh(){
 
-        for(let i of this.scene.children)
+        for(let i = 0; i < this.scene.children.length && this.scene.children[i]; i++)
             if(i.geometry.type == "CylinderGeometry")
                 this.scene.remove(i)
+            else
+                i--
         
         this.dajPionki()
     }
