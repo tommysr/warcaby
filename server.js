@@ -16,42 +16,30 @@ let pionkiTab = [
 ]
 
 
-const add = (name, req, res) => {
-    let state;
+const addPlayer = (name, req, res) => {
+    let state = "error" //no places left or username taken
+
     if (!players[0]) {
-        players[0] = name;
-        state = "player1";
+        players[0] = name
+        state = "player1"
     }
-    else if (!players[1]) {
-        if (players[0] != name) {
-            players[1] = name;
-            state = "player2";
-        }
-        else 
-            state = "player1";
+    else if (!players[1] && players[0] != name) {
+        players[1] = name
+        state = "player2"
     }
-    else {
-        if(players[0] == name)
-            state = "player1";
-        else if(players[1] == name)
-            state = "player2";
-        else
-            state = "brak miejsc";
-    }
-    res.writeHead(200, { "content-type": "text/html;charset=utf-8" })
+
     res.end(state);
 }
 
 const check = (response) =>{
-    var info = "false";
+    var info = "false"
     if (players[1])
-        info = "true";
-    response.writeHead(200, { "content-type": "text/html;charset=utf-8" })
+        info = "true"
     response.end(info);
 }
 
 const reset = (response) => {
-    players = [];
+    players = []
     pionkiTab = [
         [0, 2, 0, 2, 0, 2, 0, 2],
         [2, 0, 2, 0, 2, 0, 2, 0],
@@ -62,27 +50,24 @@ const reset = (response) => {
         [0, 1, 0, 1, 0, 1, 0, 1],
         [1, 0, 1, 0, 1, 0, 1, 0],
     ];
-    response.writeHead(200, { "content-type": "text/html;charset=utf-8" });
-    response.end("ok");
+    response.end("ok")
 }
 
-const  updateTab = (finishObj, req, res) => {
-    pionkiTab = JSON.parse(finishObj.data);
-    res.writeHead(200, { "content-type": "text/html;charset=utf-8" })
-    res.end("ok");
+const updateTab = (finishObj, req, res) => {
+    pionkiTab = JSON.parse(finishObj.data)
+    res.end("ok")
 }
 
 const compareTab = (finishObj, req, res) =>{
-    var obj = {};
+    var obj = {}
     if (finishObj.data === JSON.stringify(pionkiTab)) 
-        obj.zmiany = "false";
+        obj.zmiany = "false"
     else {
-        obj.zmiany = "true";
-        obj.pionkiTab = pionkiTab;
+        obj.zmiany = "true"
+        obj.pionkiTab = pionkiTab
     }
     var string = JSON.stringify(obj)
-    res.writeHead(200, { "content-type": "text/html;charset=utf-8" })
-    res.end(string);
+    res.end(string)
 }
 
 
@@ -95,34 +80,32 @@ const serverResponse = (request, response) => {
         var finishObj = qs.parse(allData)
         switch (finishObj.action) {
             case "add":
-                add(finishObj.name, request, response)
-                break;
+                addPlayer(finishObj.name, request, response)
+                break
             case "reset":
-                reset(response);
-                break;
+                reset(response)
+                break
             case "check":
-                check(response);
-                break;
+                check(response)
+                break
             case "update":
-                updateTab(finishObj, request, response);
-                break;
+                updateTab(finishObj, request, response)
+                break
             case "compare":
-                compareTab(finishObj, request, response);
-                break;
+                compareTab(finishObj, request, response)
+                break
         }
     })
 }
 
 var server = http.createServer(function (req, res) {
-    var request = req;
-    var response = res;
+    var request = req
+    var response = res
 
     switch (request.method) {
         case "GET":
           let url =
-            request.url == "/"
-              ? "/index.html"
-              : request.url;
+            request.url == "/" ? "/index.html" : request.url
     
           let type = mime.lookup(url);
 
@@ -131,17 +114,18 @@ var server = http.createServer(function (req, res) {
               response.writeHead(200, {
                 "Content-Type": `${type};charset=utf-8`,
               });
-              response.write(data);
-              response.end();
+              response.write(data)
+              response.end()
             });
           }
           break;
         case "POST":
-            serverResponse(request, response);
+            res.writeHead(200, { "content-type": "text/html;charset=utf-8" })
+            serverResponse(request, response)
           break;
       } 
 })
 
 server.listen(3000, function () {
-    console.log("serwer startuje na porcie 3000");
+    console.log("serwer startuje na porcie 3000")
 });
