@@ -10,12 +10,14 @@ class Game{
             0.1,
             10000);
         this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setClearColor(0x808080);
+        this.renderer.setClearColor(0x0066ff);
         this.raycaster = new THREE.Raycaster();
         this.mouseVector = new THREE.Vector2()
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         $("#root").append(this.renderer.domElement);
-        this.render() // wywołanie metody render
+        this.render() 
+  
+
 
         this.szach =  [
             [1, 0, 1, 0, 1, 0, 1, 0],
@@ -53,6 +55,11 @@ class Game{
     }
 
     init(){
+        window.onresize = () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
         
         var box = new THREE.BoxGeometry(100, 25, 100);
 
