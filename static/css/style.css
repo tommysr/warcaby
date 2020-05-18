@@ -1,0 +1,21 @@
+input, button {
+    border: 2px solid blue;
+}
+
+h1 {
+    color: red;
+}
+
+html, body, #root {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#logindiv {
+    width: 300px;
+    background-color: rgba(37, 90, 189, 0.39);
+    margin: 0 auto;
+    position: absolute;
+    border: 2px solid black;
+}
