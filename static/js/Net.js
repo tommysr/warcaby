@@ -17,10 +17,14 @@ class Net {
                 switch (data) {
                     case "player1":
                         // $(".status").html(`user: ${data.toUpperCase()} `  + login + "</br>Waiting for the secend player");
+                        $(".status").css("display", "block");
                         $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
                         $("#logindiv").css("display", "none");
-                        $(".status").css("display", "block");
+                        
                         $(".lds-grid").css("display", "inline-block");
+                        $(".backgroundToMenu").click(function(event){
+                            event.stopImmediatePropagation();
+                        });
                         game.setPoz("front");
                         game.dajPionki()
 
@@ -31,10 +35,12 @@ class Net {
                         break;
 
                     case "player2":
+                        $(".status").css("display", "block");
                         $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
                         $("#logindiv").css("display", "none");
-                        $(".status").css("display", "block");
                         $(".backgroundToMenu").css("display", "none");
+                        
+                
                         game.setPoz("back");
 
                         game.dajPionki()
@@ -43,12 +49,14 @@ class Net {
                         this.mojlogin = login;
                         break;
 
-                    case "loginz":
-                        $("#info").text(data)
+                    case "username taken":
+                        $(".status").css("display", "block");
+                        $(".status").html(`<h1>${data}</h1>`)
                         break;
 
-                    case "brak miejsc":
-                        $("#info").text(data)
+                    case "no places left":
+                        $(".status").css("display", "block");
+                        $(".status").html(`<h1>${data}</h1>`)
                         break;
                 }
             },
@@ -115,7 +123,18 @@ class Net {
             success: (data) => {
                 console.log(data)
                 if (data == "ok") {
-                    this.porownywanie = setInterval(() =>{ this.compareTabs() }, 1000);
+                    let i = 30;
+                    $(".backgroundToMenu").css("display", "block");
+                    this.porownywanie = setInterval(() =>{
+                        this.compareTabs(1) 
+                        i--;
+                        $(".backgroundToMenu").html(`<h1>${i}</h1>`);
+                        if(i==0){
+                            $(".backgroundToMenu").css("display", "none");
+                            clearInterval(this.porownywanie);
+                        }
+                        
+                    }, 1000);
                 }
             },
             error: function (xhr, status, error) {
@@ -125,17 +144,19 @@ class Net {
         });
     }
 
-    compareTabs() {
+    compareTabs(mode) {
         console.log("i")
         $.ajax({
             url: "/",
             data: { action: "compare", data: JSON.stringify(game.get_pionki()) },
             type: "POST",
             success: (data) => {
-                console.log(data);
                 var obj = JSON.parse(data);
                 console.log(obj.zmiany)
                 if (obj.zmiany == "true") {
+                    if(mode==1){
+                        $(".backgroundToMenu").css("display", "none");
+                    }
                     game.set_pionki(obj.pionkiTab);
                     game.refresh();
                 }

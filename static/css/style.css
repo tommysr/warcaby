@@ -83,4 +83,7 @@ button{
     background-color: rgba(0, 0, 0, 0.7);
     width: 100vw;
     height: 100vh;
+    text-align: center;
+    color: azure;
+    font-size: 2em;
 }
