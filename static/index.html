@@ -8,6 +8,7 @@
     <title>Document</title>
 
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/loader.css">
     <script src="libs/jquery.js"></script>
     <script src="libs/three.js"></script>
     <script src="js/Game.js"></script>
@@ -17,17 +18,37 @@
 </head>
 
 <body>
-
     <div id="root">
+
+        <!-- Status container -->
+        <div class="status"></div>
+
+        <!-- Spinner -->
+        <div class="lds-grid">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <!-- Login container -->
         <div id="logindiv">
-            <h1>LOGOWANIE:</h1>
-            <h2 id="info">podaj login</h2>
+            <h1>Login</h1>
+            <h2 id="info">Enter the name</h2>
             <div id="form">
-                <input type="text" name="login" id="loginname">
-                <button id="loginbutton">LOGUJ</button>
+                <input type="text" name="login" id="loginname"><br />
+                <button id="loginbutton">GO</button>
             </div>
             <button id="resetbutton">RESET</button>
         </div>
+
+        <!-- Background to status and login -->
+        <div class="backgroundToMenu"></div>
     </div>
 </body>
 
