@@ -21,6 +21,9 @@ class Net {
                         $("#logindiv").css("display", "none");
                         $(".status").css("display", "block");
                         $(".lds-grid").css("display", "inline-block");
+                        $(".backgroundToMenu").click(function(event){
+                            event.stopImmediatePropagation();
+                        });
                         game.setPoz("front");
                         game.dajPionki()
 
@@ -35,6 +38,8 @@ class Net {
                         $("#logindiv").css("display", "none");
                         $(".status").css("display", "block");
                         $(".backgroundToMenu").css("display", "none");
+                        
+                
                         game.setPoz("back");
 
                         game.dajPionki()
