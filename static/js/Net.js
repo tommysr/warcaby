@@ -6,7 +6,7 @@ class Net {
         this.porownywanie;
     }
     
-    loginClick(){
+    login(){
         console.log("l");
         var login = $("#loginname").val()
         $.ajax({
@@ -20,7 +20,7 @@ class Net {
                         game.setPoz("front");
                         game.dajPionki()
 
-                        this.czekaj = setInterval(() =>{ this.check() }, 500);
+                        this.czekaj = setInterval(() => this.check(), 500);
                         this.zniknij();
                         this.porownywanie = setInterval(() => this.compareTabs() , 1000);
                         this.stan = data;
@@ -38,7 +38,7 @@ class Net {
                         this.mojlogin = login;
                         break;
 
-                    case "login zajęty":
+                    case "loginz":
                         $("#info").text(data)
                         break;
 
@@ -53,7 +53,7 @@ class Net {
         });
     }
 
-    resetClick(){
+    reset(){
         console.log("r");
         $.ajax({
             url: "/",
@@ -83,7 +83,7 @@ class Net {
             success: (data) => {
                 if (data == "true") {
                     this.stop();
-                    $("#info").html(stan + ": " + mojlogin + "</br>Gracz 2 dołączył")
+                    $("#info").html(this.stan + ": " + this.mojlogin + "</br>Gracz 2 dołączył")
                 }
             },
             error: function (xhr, status, error) {
@@ -109,7 +109,7 @@ class Net {
             type: "POST",
             success: (data) => {
                 console.log(data);
-                if (data = "ok") {
+                if (data == "ok") {
                     this.porownywanie = setInterval(() =>{ this.compareTabs() }, 1000);
                 }
             },
@@ -128,8 +128,9 @@ class Net {
             type: "POST",
             success: (data) => {
                 console.log(data);
-                var obj = JSON.parse(data)
-                if (obj.zmiany == true) {
+                var obj = JSON.parse(data);
+                console.log(obj.zmiany)
+                if (obj.zmiany == "true") {
                     game.set_pionki(obj.pionkiTab);
                     game.refresh();
                 }

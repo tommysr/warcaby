@@ -17,9 +17,9 @@ class Ui{
             game.pick(event)
         })
 
-        $("#resetbutton").on("click", () => net.resetClick());
+        $("#resetbutton").on("click", () => net.reset());
 
-        $("#loginbutton").on("click", () => net.loginClick());
+        $("#loginbutton").on("click", () => net.login());
     
     }
 }
