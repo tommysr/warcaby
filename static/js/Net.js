@@ -123,7 +123,18 @@ class Net {
             success: (data) => {
                 console.log(data)
                 if (data == "ok") {
-                    this.porownywanie = setInterval(() =>{ this.compareTabs() }, 1000);
+                    let i = 30;
+                    $(".backgroundToMenu").css("display", "block");
+                    this.porownywanie = setInterval(() =>{
+                        this.compareTabs(1) 
+                        i--;
+                        $(".backgroundToMenu").html(`<h1>${i}</h1>`);
+                        if(i==0){
+                            $(".backgroundToMenu").css("display", "none");
+                            clearInterval(this.porownywanie);
+                        }
+                        
+                    }, 1000);
                 }
             },
             error: function (xhr, status, error) {
@@ -133,17 +144,19 @@ class Net {
         });
     }
 
-    compareTabs() {
+    compareTabs(mode) {
         console.log("i")
         $.ajax({
             url: "/",
             data: { action: "compare", data: JSON.stringify(game.get_pionki()) },
             type: "POST",
             success: (data) => {
-                console.log(data);
                 var obj = JSON.parse(data);
                 console.log(obj.zmiany)
                 if (obj.zmiany == "true") {
+                    if(mode==1){
+                        $(".backgroundToMenu").css("display", "none");
+                    }
                     game.set_pionki(obj.pionkiTab);
                     game.refresh();
                 }
