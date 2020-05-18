@@ -34,6 +34,7 @@ class Net {
                         $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
                         $("#logindiv").css("display", "none");
                         $(".status").css("display", "block");
+                        $(".backgroundToMenu").css("display", "none");
                         game.setPoz("back");
 
                         game.dajPionki()
