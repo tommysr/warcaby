@@ -1,7 +1,3 @@
-/*
-    klasa Game
-*/
-
 class Game{
     constructor(){
         this.scene = new THREE.Scene();
@@ -229,36 +225,16 @@ class Game{
     }
 
     dajPionki(){
- 
-        var cylinder = new THREE.CylinderGeometry(40, 40, 25, 32);
-    
-        var material2 = new THREE.MeshBasicMaterial({
-            side: THREE.DoubleSide,
-            map: new THREE.TextureLoader().load('/gfx/red.jpg'),
-            transparent: true,
-            opacity: 1,
-        })
-    
-        var material3 = new THREE.MeshBasicMaterial({
-            side: THREE.DoubleSide,
-            map: new THREE.TextureLoader().load('/gfx/green.jpg'),
-            transparent: true,
-            opacity: 1,
-        })
-
-
         for (let i = 0; i < this.szach.length; i++) {
             for (let j = 0; j < this.szach[i].length; j++) {
-                if (this.pionki[i][j] == 0) {
-                }
-                else if (this.pionki[i][j] == 1) {
-                    var pion = new THREE.Mesh(cylinder, material2);
+                if (this.pionki[i][j] == 1) {
+                    var pion = new Pionek ("red");
                     pion.userData = { player: "player1", x: i, y: j }
                     this.scene.add(pion);
                     pion.position.set(i * 100 - 350, 35, j * 100 - 350)
                 }
                 else if (this.pionki[i][j] == 2) {
-                    var pion = new THREE.Mesh(cylinder, material3);
+                    var pion = new Pionek ("green");
                     pion.userData = { player: "player2", x: i, y: j }
                     this.scene.add(pion);
                     pion.position.set(i * 100 - 350, 35, j * 100 - 350)
