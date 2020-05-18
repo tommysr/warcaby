@@ -10,11 +10,10 @@ class Game{
         this.raycaster = new THREE.Raycaster();
         this.mouseVector = new THREE.Vector2()
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+
         $("#root").append(this.renderer.domElement);
         this.render() 
   
-
-
         this.szach =  [
             [1, 0, 1, 0, 1, 0, 1, 0],
             [0, 1, 0, 1, 0, 1, 0, 1],
@@ -89,8 +88,9 @@ class Game{
         }
 
     }
+
     render(){
-        requestAnimationFrame(this.render.bind(this)); // funkcja bind(this) przekazuje obiekt this do metody render
+        requestAnimationFrame(this.render.bind(this));
         this.renderer.render(this.scene, this.camera);
         console.log("render leci")
     };
