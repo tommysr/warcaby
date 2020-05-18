@@ -127,13 +127,12 @@ class Net {
                     $(".backgroundToMenu").css("display", "block");
                     this.porownywanie = setInterval(() =>{
                         this.compareTabs(1) 
-                        i--;
                         $(".backgroundToMenu").html(`<h1>${i}</h1>`);
                         if(i==0){
                             $(".backgroundToMenu").css("display", "none");
                             clearInterval(this.porownywanie);
                         }
-                        
+                        i--;
                     }, 1000);
                 }
             },
