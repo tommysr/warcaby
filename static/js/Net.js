@@ -17,9 +17,10 @@ class Net {
                 switch (data) {
                     case "player1":
                         // $(".status").html(`user: ${data.toUpperCase()} `  + login + "</br>Waiting for the secend player");
+                        $(".status").css("display", "block");
                         $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
                         $("#logindiv").css("display", "none");
-                        $(".status").css("display", "block");
+                        
                         $(".lds-grid").css("display", "inline-block");
                         $(".backgroundToMenu").click(function(event){
                             event.stopImmediatePropagation();
@@ -34,9 +35,9 @@ class Net {
                         break;
 
                     case "player2":
+                        $(".status").css("display", "block");
                         $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
                         $("#logindiv").css("display", "none");
-                        $(".status").css("display", "block");
                         $(".backgroundToMenu").css("display", "none");
                         
                 
@@ -48,12 +49,14 @@ class Net {
                         this.mojlogin = login;
                         break;
 
-                    case "loginz":
-                        $("#info").text(data)
+                    case "username taken":
+                        $(".status").css("display", "block");
+                        $(".status").html(`<h1>${data}</h1>`)
                         break;
 
-                    case "brak miejsc":
-                        $("#info").text(data)
+                    case "no places left":
+                        $(".status").css("display", "block");
+                        $(".status").html(`<h1>${data}</h1>`)
                         break;
                 }
             },
