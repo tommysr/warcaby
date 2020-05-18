@@ -1,6 +1,3 @@
-/*
-    UI - obsługa interfejsu użytkownika
-*/
 class Ui{
     constructor(){
         this.init();
@@ -8,18 +5,9 @@ class Ui{
 
     init(){
         game.setPoz("side");
-
-        $("#select").on("change", function () {
-            game.setPoz($("#select").val());
-        });
-    
-        $("#root").on("click", function (event) {
-            game.pick(event)
-        })
-
+        $("#select").on("change", () => game.setPoz($("#select").val()));
+        $("#root").on("click", (event) => game.pick(event));
         $("#resetbutton").on("click", () => net.reset());
-
         $("#loginbutton").on("click", () => net.login());
-    
     }
 }
