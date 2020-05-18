@@ -129,9 +129,7 @@ class Game{
 
             if (element.geometry.type == "CylinderGeometry") {
 
-                //console.log(element)
                 if (element == this.picked) {
-                    //console.log("ten sam")
                     element.material = this.origin_material;
                     this.picked = "";
                 }
@@ -151,7 +149,6 @@ class Game{
             }
 
             if (this.picked) {
-                //--------- WARUNKI NA PRZESUNIĘCIE
                 var geometry = 0, pole = 0, czyste = 0, krok = 0;
 
                 if (element.geometry.type == "BoxGeometry") geometry = 1;

@@ -13,27 +13,31 @@ class Net {
             url: "/",
             data: { action: "add", name: login },
             type: "POST",
-            success:  (data) => {
+            success: (data) => {
                 switch (data) {
                     case "player1":
-                        $("#info").html(data + ": " + login + "</br>Czekanie na gracza 2")
+                        // $(".status").html(`user: ${data.toUpperCase()} `  + login + "</br>Waiting for the secend player");
+                        $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
+                        $("#logindiv").css("display", "none");
+                        $(".status").css("display", "block");
+                        $(".lds-grid").css("display", "inline-block");
                         game.setPoz("front");
                         game.dajPionki()
 
-                        this.czekaj = setInterval(() => this.check(), 500);
-                        this.zniknij();
-                        this.porownywanie = setInterval(() => this.compareTabs() , 1000);
+                        this.czekaj = setInterval(() => { this.check() }, 500);
+                        this.porownywanie = setInterval(() => this.compareTabs(), 1000);
                         this.stan = data;
                         this.mojlogin = login;
                         break;
 
                     case "player2":
-                        $("#info").text(data + ": " + login)
+                        $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
+                        $("#logindiv").css("display", "none");
+                        $(".status").css("display", "block");
                         game.setPoz("back");
 
                         game.dajPionki()
-                        this.zniknij()
-                        this.porownywanie = setInterval( () => this.compareTabs() , 1000);
+                        this.porownywanie = setInterval(() => this.compareTabs(), 1000);
                         this.stan = data;
                         this.mojlogin = login;
                         break;
@@ -70,10 +74,6 @@ class Net {
         });
     }
 
-    zniknij() {
-        $("#form").css("display", "none")
-    }
-
     check() {
         console.log("k")
         $.ajax({
@@ -81,9 +81,12 @@ class Net {
             data: { action: "check" },
             type: "POST",
             success: (data) => {
-                if (data) {
-                    this.stop()
-                    $("#info").html(this.stan + ": " + this.mojlogin + "</br>Gracz 2: " + data)
+                if (data == "true") {
+                    this.stop();
+                    $(".status").html(`${$(".status").html()}player2 join to game (black pawns)`)
+                    $(".lds-grid").css("display", "none");
+                    $(".backgroundToMenu").css("display", "none");
+                    $("#info").html(this.stan + ": " + this.mojlogin + "</br>Gracz 2 dołączył")
                 }
             },
             error: function (xhr, status, error) {
@@ -116,7 +119,7 @@ class Net {
             },
             error: function (xhr, status, error) {
                 console.log("error")
-                this.updateTabs(game.get_pionki())
+                this.updateTabs(game.get_pionki());
             },
         });
     }
@@ -145,6 +148,5 @@ class Net {
 }
 
 
-  
 
-  
+
