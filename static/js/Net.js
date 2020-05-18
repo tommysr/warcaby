@@ -61,7 +61,7 @@ class Net {
             type: "POST",
             success: (data) => {
                 if (data == "ok") {
-                    location.reload();
+                    location.reload()
                 }
             },
             error: function (xhr, status, error) {
@@ -71,19 +71,19 @@ class Net {
     }
 
     zniknij() {
-        $("#form").css("display", "none");
+        $("#form").css("display", "none")
     }
 
     check() {
-        console.log("k");
+        console.log("k")
         $.ajax({
             url: "/",
             data: { action: "check" },
             type: "POST",
             success: (data) => {
-                if (data == "true") {
-                    this.stop();
-                    $("#info").html(this.stan + ": " + this.mojlogin + "</br>Gracz 2 dołączył")
+                if (data) {
+                    this.stop()
+                    $("#info").html(this.stan + ": " + this.mojlogin + "</br>Gracz 2: " + data)
                 }
             },
             error: function (xhr, status, error) {
@@ -93,12 +93,13 @@ class Net {
     }
 
     get_stan(){
-        return this.stan;
+        return this.stan
     }
 
     stop() {
-        clearInterval(this.czekaj);
+        clearInterval(this.czekaj)    
     }
+
 
     updateTabs(pionki){
         console.log("u");
@@ -108,7 +109,7 @@ class Net {
             data: { action: "update", data: JSON.stringify(pionki) },
             type: "POST",
             success: (data) => {
-                console.log(data);
+                console.log(data)
                 if (data == "ok") {
                     this.porownywanie = setInterval(() =>{ this.compareTabs() }, 1000);
                 }
@@ -121,7 +122,7 @@ class Net {
     }
 
     compareTabs() {
-        console.log("i");
+        console.log("i")
         $.ajax({
             url: "/",
             data: { action: "compare", data: JSON.stringify(game.get_pionki()) },
@@ -138,7 +139,7 @@ class Net {
             error: function (xhr, status, error) {
                 console.log("error")
             },
-        });
+        })
     }
 
 }
