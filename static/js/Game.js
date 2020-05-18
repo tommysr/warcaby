@@ -1,54 +1,61 @@
-/*
-    klasa Game
-*/
-
-function Game() {
-
-    var camera;
-    var scene;
-    var raycaster = new THREE.Raycaster();
-    var mouseVector = new THREE.Vector2()
-
-    var szach = [
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1],
-    ]
-
-    var pionki = [
-        [0, 2, 0, 2, 0, 2, 0, 2],
-        [2, 0, 2, 0, 2, 0, 2, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-    ]
-
-    var init = function () {
-
-        var renderer = new THREE.WebGLRenderer();
-        renderer.setClearColor(0x808080);
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        $("#root").append(renderer.domElement);
-
-        scene = new THREE.Scene();
-
-        camera = new THREE.PerspectiveCamera(
-            45,
+class Game{
+    constructor(){
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera( 45,
             window.innerWidth / window.innerHeight,
             0.1,
-            10000
-        );
+            10000);
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderer.setClearColor(0x0066ff);
+        this.raycaster = new THREE.Raycaster();
+        this.mouseVector = new THREE.Vector2()
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
 
-        //---------- SZACHOWNICA
+        $("#root").append(this.renderer.domElement);
+        this.render() 
+  
+        this.szach =  [
+            [1, 0, 1, 0, 1, 0, 1, 0],
+            [0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 0],
+            [0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 0],
+            [0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 0],
+            [0, 1, 0, 1, 0, 1, 0, 1],
+        ];
+        this.pionki = [
+            [0, 2, 0, 2, 0, 2, 0, 2],
+            [2, 0, 2, 0, 2, 0, 2, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 1, 0, 1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1, 0, 1, 0],
+        ];
 
+        this.picked_material = new THREE.MeshBasicMaterial({
+            side: THREE.DoubleSide,
+            color: 0xffff00,
+            transparent: true,
+            opacity: 1,
+        })
+
+        this.old_material;
+        this.old_picked;
+        this.picked;
+        this.orginal_material;
+        this.init();
+    }
+
+    init(){
+        window.onresize = () => {
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
         var box = new THREE.BoxGeometry(100, 25, 100);
 
         var material0 = new THREE.MeshBasicMaterial({
@@ -65,67 +72,57 @@ function Game() {
             opacity: 1,
         })
 
-        for (i = 0; i < szach.length; i++) {
-            for (j = 0; j < szach[i].length; j++) {
-                if (szach[i][j] == 0) {
+        for (let i = 0; i < this.szach.length; i++) {
+            for (let j = 0; j < this.szach[i].length; j++) {
+                if (this.szach[i][j] == 0) {
                     var cube = new THREE.Mesh(box, material0);
                     cube.userData = { color: "black", x: i, y: j }
                 }
-                else if (szach[i][j] == 1) {
+                else if (this.szach[i][j] == 1) {
                     var cube = new THREE.Mesh(box, material1);
                     cube.userData = { color: "white", x: i, y: j }
                 }
-                scene.add(cube);
+                this.scene.add(cube);
                 cube.position.set(i * 100 - 350, 12.5, j * 100 - 350)
             }
         }
 
-        function render() {
-            requestAnimationFrame(render);
-            renderer.render(scene, camera);
-        }
-        render();
-    };
-    init();
+    }
 
-    this.setPoz = function (val) {
-        poz = val;
+    render(){
+        requestAnimationFrame(this.render.bind(this));
+        this.renderer.render(this.scene, this.camera);
+        console.log("render leci")
+    };
+
+    setPoz(val) {
+        let poz = val;
         switch (poz) {
             case "front":
-                camera.position.set(780, 400, 0)
-                camera.lookAt(scene.position)
+                this.camera.position.set(780, 400, 0)
+                this.camera.lookAt(this.scene.position)
                 break;
             case "back":
-                camera.position.set(-780, 400, 0)
-                camera.lookAt(scene.position)
+                this.camera.position.set(-780, 400, 0)
+                this.camera.lookAt(this.scene.position)
                 break;
             case "top":
-                camera.position.set(0, 1000, 0)
-                camera.lookAt(scene.position)
+                this.camera.position.set(0, 1000, 0)
+                this.camera.lookAt(this.scene.position)
                 break;
             case "side":
-                camera.position.set(0, 300, 1000)
-                camera.lookAt(scene.position)
+                this.camera.position.set(0, 300, 1000)
+                this.camera.lookAt(this.scene.position)
                 break;
         }
     }
 
-    var picked_material = new THREE.MeshBasicMaterial({
-        side: THREE.DoubleSide,
-        color: 0xffff00,
-        transparent: true,
-        opacity: 1,
-    })
-    var old_material;
-    var old_picked;
-    var picked;
-    var orginal_material;
 
-    this.pick = function (event) {
-        mouseVector.x = (event.clientX / $(window).width()) * 2 - 1;
-        mouseVector.y = -(event.clientY / $(window).height()) * 2 + 1;
-        raycaster.setFromCamera(mouseVector, camera);
-        var intersects = raycaster.intersectObjects(scene.children);
+    pick(event) {
+        this.mouseVector.x = (event.clientX / $(window).width()) * 2 - 1;
+        this.mouseVector.y = -(event.clientY / $(window).height()) * 2 + 1;
+        this.raycaster.setFromCamera(this.mouseVector, this.camera);
+        var intersects = this.raycaster.intersectObjects(this.scene.children);
 
         if (intersects.length > 0) {
             var element = intersects[0].object;
@@ -133,67 +130,67 @@ function Game() {
             if (element.geometry.type == "CylinderGeometry") {
 
                 //console.log(element)
-                if (element == picked) {
+                if (element == this.picked) {
                     //console.log("ten sam")
-                    element.material = origin_material;
-                    picked = "";
+                    element.material = this.origin_material;
+                    this.picked = "";
                 }
 
                 else if (element.userData.player == net.get_stan()) {
-                    picked = element;
+                    this.picked = element;
 
-                    if (old_picked) {
-                        old_picked.material = origin_material;
+                    if (this.old_picked) {
+                        this.old_picked.material = this.origin_material;
                     }
 
-                    origin_material = picked.material;
-                    old_picked = picked;
+                    this.origin_material = this.picked.material;
+                    this.old_picked = this.picked;
 
-                    picked.material = picked_material;
+                    this.picked.material = this.picked_material;
                 }
             }
 
-            if (picked) {
+            if (this.picked) {
                 //--------- WARUNKI NA PRZESUNIĘCIE
                 var geometry = 0, pole = 0, czyste = 0, krok = 0;
 
                 if (element.geometry.type == "BoxGeometry") geometry = 1;
                 if (element.userData.color == "black") pole = 1;
-                if (pionki[element.userData.x][element.userData.y] == 0) czyste = 1;
+                if (this.pionki[element.userData.x][element.userData.y] == 0) czyste = 1;
 
                 if (net.get_stan() == "player1") {
-                    if (element.userData.x - picked.userData.x == -1 && Math.abs(picked.userData.y - element.userData.y) == 1) krok = 1;
-                    if (element.userData.x - picked.userData.x == -2 && Math.abs(picked.userData.y - element.userData.y) == 2) {
+                    if (element.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - element.userData.y) == 1) krok = 1;
+                    if (element.userData.x - this.picked.userData.x == -2 && Math.abs(this.picked.userData.y - element.userData.y) == 2) {
                         var zbijany = {};
-                        zbijany.x = (element.userData.x + picked.userData.x) / 2;
-                        zbijany.y = (element.userData.y + picked.userData.y) / 2;
-                        if (pionki[zbijany.x][zbijany.y] == 2) {
-                            pionki[zbijany.x][zbijany.y] = 0;
+                        zbijany.x = (element.userData.x + this.picked.userData.x) / 2;
+                        zbijany.y = (element.userData.y + this.picked.userData.y) / 2;
+                        if (this.pionki[zbijany.x][zbijany.y] == 2) {
+                            this.pionki[zbijany.x][zbijany.y] = 0;
                             krok = 1;
 
-                            for (i = 0; i < scene.children.length; i++) {
-                                if (scene.children[i].userData.player == "player2" && scene.children[i].userData.x == zbijany.x && scene.children[i].userData.y == zbijany.y) {
-                                    zbijany.obj = scene.children[i];
-                                    scene.remove(zbijany.obj);
+                            for (let i = 0; i < this.scene.children.length; i++) {
+                                if (this.scene.children[i].userData.player == "player2" && this.scene.children[i].userData.x == zbijany.x && this.scene.children[i].userData.y == zbijany.y) {
+                                    zbijany.obj = this.scene.children[i];
+                                    this.scene.remove(zbijany.obj);
                                 }
                             }
                         }
                     }
                 }
                 else {
-                    if (element.userData.x - picked.userData.x == 1 && Math.abs(picked.userData.y - element.userData.y) == 1) krok = 1;
-                    if (element.userData.x - picked.userData.x == 2 && Math.abs(picked.userData.y - element.userData.y) == 2) {
+                    if (element.userData.x - this.picked.userData.x == 1 && Math.abs(this.picked.userData.y - element.userData.y) == 1) krok = 1;
+                    if (element.userData.x - this.picked.userData.x == 2 && Math.abs(this.picked.userData.y - element.userData.y) == 2) {
                         var zbijany = {};
-                        zbijany.x = (element.userData.x + picked.userData.x) / 2;
-                        zbijany.y = (element.userData.y + picked.userData.y) / 2;
-                        if (pionki[zbijany.x][zbijany.y] == 1) {
-                            pionki[zbijany.x][zbijany.y] = 0;
+                        zbijany.x = (element.userData.x + this.picked.userData.x) / 2;
+                        zbijany.y = (element.userData.y + this.picked.userData.y) / 2;
+                        if (this.pionki[zbijany.x][zbijany.y] == 1) {
+                            this.pionki[zbijany.x][zbijany.y] = 0;
                             krok = 1;
 
-                            for (i = 0; i < scene.children.length; i++) {
-                                if (scene.children[i].userData.player == "player1" && scene.children[i].userData.x == zbijany.x && scene.children[i].userData.y == zbijany.y) {
-                                    zbijany.obj = scene.children[i];
-                                    scene.remove(zbijany.obj);
+                            for (let i = 0; i < this.scene.children.length; i++) {
+                                if (this.scene.children[i].userData.player == "player1" && this.scene.children[i].userData.x == zbijany.x && this.scene.children[i].userData.y == zbijany.y) {
+                                    zbijany.obj = this.scene.children[i];
+                                    this.scene.remove(zbijany.obj);
                                 }
                             }
                         }
@@ -202,88 +199,69 @@ function Game() {
 
 
                 if (geometry && pole && czyste && krok) {
-                    pionki[picked.userData.x][picked.userData.y] = 0
+                    this.pionki[this.picked.userData.x][this.picked.userData.y] = 0
 
                     if (net.get_stan() == "player1") {
-                        pionki[element.userData.x][element.userData.y] = 1
+                        this.pionki[element.userData.x][element.userData.y] = 1
                     }
                     else if (net.get_stan() == "player2") {
-                        pionki[element.userData.x][element.userData.y] = 2
+                        this.pionki[element.userData.x][element.userData.y] = 2
                     }
 
-                    picked.userData.x = element.userData.x;
-                    picked.userData.y = element.userData.y;
+                    this.picked.userData.x = element.userData.x;
+                    this.picked.userData.y = element.userData.y;
 
-                    picked.position.x = element.position.x;
-                    picked.position.z = element.position.z;
-                    picked.position.y = 35;
+                    this.picked.position.x = element.position.x;
+                    this.picked.position.z = element.position.z;
+                    this.picked.position.y = 35;
 
-                    picked.material = origin_material;
-                    picked = "";
+                    this.picked.material = this.origin_material;
+                    this.picked = "";
 
-                    net.updateTabs(pionki)
+                    net.updateTabs(this.pionki)
                 }
             }
         }
     }
 
-    var cylinder = new THREE.CylinderGeometry(40, 40, 25, 32);
-
-    var material2 = new THREE.MeshBasicMaterial({
-        side: THREE.DoubleSide,
-        map: new THREE.TextureLoader().load('/gfx/red.jpg'),
-        transparent: true,
-        opacity: 1,
-    })
-
-    var material3 = new THREE.MeshBasicMaterial({
-        side: THREE.DoubleSide,
-        map: new THREE.TextureLoader().load('/gfx/green.jpg'),
-        transparent: true,
-        opacity: 1,
-    })
-
-    this.dajPionki = function () {
-
-        for (i = 0; i < szach.length; i++) {
-            for (j = 0; j < szach[i].length; j++) {
-                if (pionki[i][j] == 0) {
-                }
-                else if (pionki[i][j] == 1) {
-                    var pion = new THREE.Mesh(cylinder, material2);
+    dajPionki(){
+        for (let i = 0; i < this.szach.length; i++) {
+            for (let j = 0; j < this.szach[i].length; j++) {
+                if (this.pionki[i][j] == 1) {
+                    var pion = new Pionek ("red");
                     pion.userData = { player: "player1", x: i, y: j }
-                    scene.add(pion);
+                    this.scene.add(pion);
                     pion.position.set(i * 100 - 350, 35, j * 100 - 350)
                 }
-                else if (pionki[i][j] == 2) {
-                    var pion = new THREE.Mesh(cylinder, material3);
+                else if (this.pionki[i][j] == 2) {
+                    var pion = new Pionek ("green");
                     pion.userData = { player: "player2", x: i, y: j }
-                    scene.add(pion);
+                    this.scene.add(pion);
                     pion.position.set(i * 100 - 350, 35, j * 100 - 350)
                 }
             }
         }
     }
 
-    this.get_pionki = function () {
-        return pionki;
+    get_pionki(){
+        return this.pionki;
     }
 
-    this.set_pionki = function (new_pionki) {
-        pionki = new_pionki;
+
+    set_pionki(new_pionki){
+        this.pionki = new_pionki;
     }
 
-    this.refresh = function () {
-        //console.log(scene.children)
-        var c = 0;
-        while (scene.children[c]) {
-            if (scene.children[c].geometry.type == "CylinderGeometry") {
-                scene.remove(scene.children[c])
-            }
-            else {
-                c++;
-            }
+    refresh(){
+    var c = 0;
+    while (this.scene.children[c]) {
+        if (this.scene.children[c].geometry.type == "CylinderGeometry") {
+            this.scene.remove(this.scene.children[c])
         }
-        this.dajPionki();
+        else {
+            c++;
+        }
+    }
+    this.dajPionki();
     }
 }

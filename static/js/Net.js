@@ -5,8 +5,13 @@ class Net {
         this.mojlogin;
         this.porownywanie;
     }
+<<<<<<< HEAD
 
     loginClick() {
+=======
+    
+    login(){
+>>>>>>> 02bd90cab9f66e637d1f3c9ab28fef9d65effd4c
         console.log("l");
         var login = $("#loginname").val()
         $.ajax({
@@ -24,8 +29,14 @@ class Net {
                         game.setPoz("front");
                         game.dajPionki()
 
+<<<<<<< HEAD
                         this.czekaj = setInterval(() => { this.check() }, 500);
                         this.porownywanie = setInterval(() => this.compareTabs(), 1000);
+=======
+                        this.czekaj = setInterval(() => this.check(), 500);
+                        this.zniknij();
+                        this.porownywanie = setInterval(() => this.compareTabs() , 1000);
+>>>>>>> 02bd90cab9f66e637d1f3c9ab28fef9d65effd4c
                         this.stan = data;
                         this.mojlogin = login;
                         break;
@@ -42,7 +53,7 @@ class Net {
                         this.mojlogin = login;
                         break;
 
-                    case "login zajęty":
+                    case "loginz":
                         $("#info").text(data)
                         break;
 
@@ -57,7 +68,11 @@ class Net {
         });
     }
 
+<<<<<<< HEAD
     resetClick() {
+=======
+    reset(){
+>>>>>>> 02bd90cab9f66e637d1f3c9ab28fef9d65effd4c
         console.log("r");
         $.ajax({
             url: "/",
@@ -83,9 +98,13 @@ class Net {
             success: (data) => {
                 if (data == "true") {
                     this.stop();
+<<<<<<< HEAD
                     $(".status").html(`${$(".status").html()}player2 join to game (black pawns)`)
                     $(".lds-grid").css("display", "none");
                     $(".backgroundToMenu").css("display", "none");
+=======
+                    $("#info").html(this.stan + ": " + this.mojlogin + "</br>Gracz 2 dołączył")
+>>>>>>> 02bd90cab9f66e637d1f3c9ab28fef9d65effd4c
                 }
             },
             error: function (xhr, status, error) {
@@ -111,8 +130,13 @@ class Net {
             type: "POST",
             success: (data) => {
                 console.log(data);
+<<<<<<< HEAD
                 if (data = "ok") {
                     this.porownywanie = setInterval(() => { this.compareTabs() }, 1000);
+=======
+                if (data == "ok") {
+                    this.porownywanie = setInterval(() =>{ this.compareTabs() }, 1000);
+>>>>>>> 02bd90cab9f66e637d1f3c9ab28fef9d65effd4c
                 }
             },
             error: function (xhr, status, error) {
@@ -130,8 +154,9 @@ class Net {
             type: "POST",
             success: (data) => {
                 console.log(data);
-                var obj = JSON.parse(data)
-                if (obj.zmiany == true) {
+                var obj = JSON.parse(data);
+                console.log(obj.zmiany)
+                if (obj.zmiany == "true") {
                     game.set_pionki(obj.pionkiTab);
                     game.refresh();
                 }
