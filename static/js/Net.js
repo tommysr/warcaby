@@ -81,9 +81,9 @@ class Net {
             data: { action: "check" },
             type: "POST",
             success: (data) => {
-                if (data == "true") {
+                if (data != "") {
                     this.stop();
-                    $(".status").html(`${$(".status").html()}player2 join to game (black pawns)`)
+                    $(".status").html(`${$(".status").html()}${data} joined to game (black pawns)`)
                     $(".lds-grid").css("display", "none");
                     $(".backgroundToMenu").css("display", "none");
                     $("#info").html(this.stan + ": " + this.mojlogin + "</br>Gracz 2 dołączył")

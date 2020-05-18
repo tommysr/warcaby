@@ -5,31 +5,25 @@ const mime = require("mime-types")
 const path = require("path")
 
 let players = [];
-let pionkiTab = [
-    [0, 2, 0, 2, 0, 2, 0, 2],
-    [2, 0, 2, 0, 2, 0, 2, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 1, 0, 1, 0, 1],
-    [1, 0, 1, 0, 1, 0, 1, 0],
-]
+let pionkiTab = []
 
 
-const addPlayer = (name, res) => {
-    let state = "error" //no places left or username taken
+const addPlayer = (name) => {
 
-    if (!players[0]) {
+    if(!players[0]){
         players[0] = name
-        state = "player1"
+        return 'player1'
     }
-    else if (!players[1] && players[0] != name) {
-        players[1] = name
-        state = "player2"
+    if(!players[1]){
+        if(players[0] == name)
+            return 'username taken'
+        else{
+            players[1] = name
+            return 'player2'
+        }
     }
-
-    res.end(state)
+    else
+        return 'no places left'
 }
 
 
@@ -45,9 +39,8 @@ const resetBoard = (res) => {
         [0, 1, 0, 1, 0, 1, 0, 1],
         [1, 0, 1, 0, 1, 0, 1, 0]
     ]
-
-    res.end("ok")
 }
+resetBoard()
 
 const updateTab = (finishObj, res) => {
     pionkiTab = JSON.parse(finishObj.data)
@@ -78,10 +71,11 @@ const serverres = (req, res) => {
 
         switch (finishObj.action) {
             case "add":
-                addPlayer(finishObj.name, res)
+                res.end(addPlayer(finishObj.name))
                 break
             case "reset":
                 resetBoard(res)
+                res.end("ok")
                 break
             case "check":
                 res.end(players[1] ? players[1] : "")
