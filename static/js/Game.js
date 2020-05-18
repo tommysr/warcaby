@@ -42,11 +42,11 @@ class Game{
             opacity: 1,
         })
 
-        this.old_material;
-        this.old_picked;
-        this.picked;
-        this.orginal_material;
-        this.init();
+        this.old_material
+        this.old_picked
+        this.picked
+        this.orginal_material
+        this.init()
     }
 
     init(){
@@ -118,111 +118,121 @@ class Game{
 
 
     pick(event) {
-        this.mouseVector.x = (event.clientX / $(window).width()) * 2 - 1;
-        this.mouseVector.y = -(event.clientY / $(window).height()) * 2 + 1;
-        this.raycaster.setFromCamera(this.mouseVector, this.camera);
-        var intersects = this.raycaster.intersectObjects(this.scene.children);
+        this.mouseVector.x = (event.clientX / $(window).width()) * 2 - 1
+        this.mouseVector.y = -(event.clientY / $(window).height()) * 2 + 1
+        this.raycaster.setFromCamera(this.mouseVector, this.camera)
+        var intersects = this.raycaster.intersectObjects(this.scene.children)
 
-        if (intersects.length > 0) {
-            var element = intersects[0].object;
+        if(intersects) {
+            var el = intersects[0].object
 
-            if (element.geometry.type == "CylinderGeometry") {
+            if (el.geometry.type == "CylinderGeometry") {
 
-                if (element == this.picked) {
-                    element.material = this.origin_material;
-                    this.picked = "";
+                if (el == this.picked) {
+                    el.material = this.origin_material
+                    this.putDown()
                 }
-
-                else if (element.userData.player == net.get_stan()) {
-                    this.picked = element;
+                else if (el.userData.player == net.get_stan()) {
+                    this.picked = el
 
                     if (this.old_picked) {
-                        this.old_picked.material = this.origin_material;
+                        this.old_picked.material = this.origin_material
                     }
 
-                    this.origin_material = this.picked.material;
-                    this.old_picked = this.picked;
+                    this.origin_material = this.picked.material
+                    this.old_picked = this.picked
 
-                    this.picked.material = this.picked_material;
+                    this.picked.material = this.picked_material
                 }
             }
 
-            if (this.picked) {
-                var geometry = 0, pole = 0, czyste = 0, krok = 0;
-
-                if (element.geometry.type == "BoxGeometry") geometry = 1;
-                if (element.userData.color == "black") pole = 1;
-                if (this.pionki[element.userData.x][element.userData.y] == 0) czyste = 1;
-
-                if (net.get_stan() == "player1") {
-                    if (element.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - element.userData.y) == 1) krok = 1;
-                    if (element.userData.x - this.picked.userData.x == -2 && Math.abs(this.picked.userData.y - element.userData.y) == 2) {
-                        var zbijany = {};
-                        zbijany.x = (element.userData.x + this.picked.userData.x) / 2;
-                        zbijany.y = (element.userData.y + this.picked.userData.y) / 2;
-                        if (this.pionki[zbijany.x][zbijany.y] == 2) {
-                            this.pionki[zbijany.x][zbijany.y] = 0;
-                            krok = 1;
-
-                            for (let i = 0; i < this.scene.children.length; i++) {
-                                if (this.scene.children[i].userData.player == "player2" && this.scene.children[i].userData.x == zbijany.x && this.scene.children[i].userData.y == zbijany.y) {
-                                    zbijany.obj = this.scene.children[i];
-                                    this.scene.remove(zbijany.obj);
-                                }
-                            }
-                        }
-                    }
-                }
-                else {
-                    if (element.userData.x - this.picked.userData.x == 1 && Math.abs(this.picked.userData.y - element.userData.y) == 1) krok = 1;
-                    if (element.userData.x - this.picked.userData.x == 2 && Math.abs(this.picked.userData.y - element.userData.y) == 2) {
-                        var zbijany = {};
-                        zbijany.x = (element.userData.x + this.picked.userData.x) / 2;
-                        zbijany.y = (element.userData.y + this.picked.userData.y) / 2;
-                        if (this.pionki[zbijany.x][zbijany.y] == 1) {
-                            this.pionki[zbijany.x][zbijany.y] = 0;
-                            krok = 1;
-
-                            for (let i = 0; i < this.scene.children.length; i++) {
-                                if (this.scene.children[i].userData.player == "player1" && this.scene.children[i].userData.x == zbijany.x && this.scene.children[i].userData.y == zbijany.y) {
-                                    zbijany.obj = this.scene.children[i];
-                                    this.scene.remove(zbijany.obj);
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-                if (geometry && pole && czyste && krok) {
-                    this.pionki[this.picked.userData.x][this.picked.userData.y] = 0
-
-                    if (net.get_stan() == "player1") {
-                        this.pionki[element.userData.x][element.userData.y] = 1
-                    }
-                    else if (net.get_stan() == "player2") {
-                        this.pionki[element.userData.x][element.userData.y] = 2
-                    }
-
-                    this.picked.userData.x = element.userData.x;
-                    this.picked.userData.y = element.userData.y;
-
-                    this.picked.position.x = element.position.x;
-                    this.picked.position.z = element.position.z;
-                    this.picked.position.y = 35;
-
-                    this.picked.material = this.origin_material;
-                    this.picked = "";
-
-                    net.updateTabs(this.pionki)
-                }
-            }
+            if (this.picked) 
+                this.pickUp(el, intersects)
         }
     }
 
+
+    pickUp(el, intersects){
+
+
+        var geometry = 0, pole = 0, czyste = 0, krok = 0
+
+        if (el.geometry.type == "BoxGeometry") geometry = 1
+        if (el.userData.color == "black") pole = 1
+        if (this.pionki[el.userData.x][el.userData.y] == 0) czyste = 1
+
+        if (net.get_stan() == "player1") {
+            if (el.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) krok = 1
+            if (el.userData.x - this.picked.userData.x == -2 && Math.abs(this.picked.userData.y - el.userData.y) == 2) {
+                var zbijany = {}
+                zbijany.x = (el.userData.x + this.picked.userData.x) / 2
+                zbijany.y = (el.userData.y + this.picked.userData.y) / 2
+                if (this.pionki[zbijany.x][zbijany.y] == 2) {
+                    this.pionki[zbijany.x][zbijany.y] = 0
+                    krok = 1
+
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        if (this.scene.children[i].userData.player == "player2" && this.scene.children[i].userData.x == zbijany.x && this.scene.children[i].userData.y == zbijany.y) {
+                            zbijany.obj = this.scene.children[i];
+                            this.scene.remove(zbijany.obj);
+                        }
+                    }
+                }
+            }
+            
+        }
+        else {
+            if (el.userData.x - this.picked.userData.x == 1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) krok = 1;
+            if (el.userData.x - this.picked.userData.x == 2 && Math.abs(this.picked.userData.y - el.userData.y) == 2) {
+                var zbijany = {};
+                zbijany.x = (el.userData.x + this.picked.userData.x) / 2;
+                zbijany.y = (el.userData.y + this.picked.userData.y) / 2;
+                if (this.pionki[zbijany.x][zbijany.y] == 1) {
+                    this.pionki[zbijany.x][zbijany.y] = 0;
+                    krok = 1;
+
+                    for (let i = 0; i < this.scene.children.length; i++) {
+                        if (this.scene.children[i].userData.player == "player1" && this.scene.children[i].userData.x == zbijany.x && this.scene.children[i].userData.y == zbijany.y) {
+                            zbijany.obj = this.scene.children[i];
+                            this.scene.remove(zbijany.obj);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if (geometry && pole && czyste && krok) {
+            this.pionki[this.picked.userData.x][this.picked.userData.y] = 0
+
+            if (net.get_stan())
+                this.pionki[el.userData.x][el.userData.y] = net.get_stan() == 'player1' ? 1 : 2
+            
+
+            this.picked.userData.x = el.userData.x;
+            this.picked.userData.y = el.userData.y;
+
+            this.picked.position.x = el.position.x;
+            this.picked.position.z = el.position.z;
+            this.picked.position.y = 35;
+
+            this.picked.material = this.origin_material;
+            this.putDown()
+
+            net.updateTabs(this.pionki)
+        }
+        
+        
+    }
+
+
+    putDown(){
+        this.picked = null
+    }
+
     dajPionki(){
-        for (let i = 0; i < this.szach.length; i++) {
-            for (let j = 0; j < this.szach[i].length; j++) {
+        for (let i in this.szach) 
+            for (let j in this.szach[0]) {
                 let pion = null
 
                 if (this.pionki[i][j] == 1) {
@@ -239,16 +249,14 @@ class Game{
                     pion.position.set(i * 100 - 350, 35, j * 100 - 350)
                 }
             }
-        }
     }
 
     get_pionki(){
         return this.pionki
     }
 
-
-    set_pionki(new_pionki){
-        this.pionki = new_pionki
+    set_pionki(pionki){
+        this.pionki = pionki
     }
 
     refresh(){
