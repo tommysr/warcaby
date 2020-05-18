@@ -224,15 +224,18 @@ class Game{
     dajPionki(){
         for (let i = 0; i < this.szach.length; i++) {
             for (let j = 0; j < this.szach[i].length; j++) {
+                let pion = null
+
                 if (this.pionki[i][j] == 1) {
-                    var pion = new Pionek ("red");
+                    pion = new Pionek ("red");
                     pion.userData = { player: "player1", x: i, y: j }
-                    this.scene.add(pion);
-                    pion.position.set(i * 100 - 350, 35, j * 100 - 350)
                 }
                 else if (this.pionki[i][j] == 2) {
-                    var pion = new Pionek ("green");
+                    pion = new Pionek ("green");
                     pion.userData = { player: "player2", x: i, y: j }
+                }
+
+                if(pion){
                     this.scene.add(pion);
                     pion.position.set(i * 100 - 350, 35, j * 100 - 350)
                 }
@@ -241,24 +244,20 @@ class Game{
     }
 
     get_pionki(){
-        return this.pionki;
+        return this.pionki
     }
 
 
     set_pionki(new_pionki){
-        this.pionki = new_pionki;
+        this.pionki = new_pionki
     }
 
     refresh(){
-    var c = 0;
-    while (this.scene.children[c]) {
-        if (this.scene.children[c].geometry.type == "CylinderGeometry") {
-            this.scene.remove(this.scene.children[c])
-        }
-        else {
-            c++;
-        }
-    }
-    this.dajPionki();
+
+        for(let i of this.scene.children)
+            if(i.geometry.type == "CylinderGeometry")
+                this.scene.remove(i)
+        
+        this.dajPionki()
     }
 }
