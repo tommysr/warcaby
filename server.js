@@ -1,7 +1,7 @@
-var http = require("http");
-var qs = require("querystring");
-var fs = require("fs");
-var mime = require("mime-types");
+const http = require("http");
+const qs = require("querystring");
+const fs = require("fs");
+const mime = require("mime-types");
 
 let players = [];
 let pionkiTab = [
@@ -16,7 +16,7 @@ let pionkiTab = [
 ]
 
 
-const addPlayer = (name, req, res) => {
+const addPlayer = (name, res) => {
     let state = "error" //no places left or username taken
 
     if (!players[0]) {
@@ -31,14 +31,12 @@ const addPlayer = (name, req, res) => {
     res.end(state);
 }
 
-const check = (response) =>{
-    var info = "false"
-    if (players[1])
-        info = "true"
-    response.end(info);
+const check = (res) =>{
+
+    res.end(players[1] ? players[1] : "")
 }
 
-const reset = (response) => {
+const reset = (res) => {
     players = []
     pionkiTab = [
         [0, 2, 0, 2, 0, 2, 0, 2],
@@ -48,9 +46,10 @@ const reset = (response) => {
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-    ];
-    response.end("ok")
+        [1, 0, 1, 0, 1, 0, 1, 0]
+    ]
+
+    res.end("ok")
 }
 
 const updateTab = (finishObj, req, res) => {
@@ -60,68 +59,70 @@ const updateTab = (finishObj, req, res) => {
 
 const compareTab = (finishObj, req, res) =>{
     var obj = {}
+
     if (finishObj.data === JSON.stringify(pionkiTab)) 
         obj.zmiany = "false"
     else {
         obj.zmiany = "true"
         obj.pionkiTab = pionkiTab
     }
-    var string = JSON.stringify(obj)
-    res.end(string)
+
+    res.end(JSON.stringify(obj))
 }
 
 
-const serverResponse = (request, response) => {
+const serverres = (req, res) => {
     var allData = "";
-    request.on("data", function (data) {
+    req.on("data", function (data) {
         allData += data
     })
-    request.on("end", function (data) {
+    req.on("end", function (data) {
         var finishObj = qs.parse(allData)
+
         switch (finishObj.action) {
             case "add":
-                addPlayer(finishObj.name, request, response)
+                addPlayer(finishObj.name, res)
                 break
             case "reset":
-                reset(response)
+                reset(res)
                 break
             case "check":
-                check(response)
+                check(res)
                 break
             case "update":
-                updateTab(finishObj, request, response)
+                updateTab(finishObj, req, res)
                 break
             case "compare":
-                compareTab(finishObj, request, response)
+                compareTab(finishObj, req, res)
                 break
         }
     })
 }
 
 var server = http.createServer(function (req, res) {
-    var request = req
-    var response = res
+    var req = req
+    var res = res
 
-    switch (request.method) {
+    switch (req.method) {
         case "GET":
           let url =
-            request.url == "/" ? "/index.html" : request.url
+            req.url == "/" ? "/index.html" : req.url
     
           let type = mime.lookup(url);
 
           if (type && fs.existsSync(`static/${decodeURI(url)}`)) {
             fs.readFile(`static/${decodeURI(url)}`, function (error, data) {
-              response.writeHead(200, {
+              res.writeHead(200, {
                 "Content-Type": `${type};charset=utf-8`,
               });
-              response.write(data)
-              response.end()
+              res.write(data)
+              res.end()
             });
           }
           break;
         case "POST":
             res.writeHead(200, { "content-type": "text/html;charset=utf-8" })
-            serverResponse(request, response)
+            serverres(req, res)
           break;
       } 
 })
