@@ -119,6 +119,9 @@ class Net {
                 if (data == "ok") {
                     let i = 30;
                     $(".backgroundToMenu").css("display", "block");
+                    $(".backgroundToMenu").click(function(event){
+                        event.stopImmediatePropagation();
+                    });
                     this.porownywanie = setInterval(() =>{
                         this.compareTabs(1) 
                         $(".backgroundToMenu").html(`<h1>${i}</h1>`);
