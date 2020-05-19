@@ -13,6 +13,24 @@ body{
     height: 100vh;
 }
 
+.state{
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 15vh;
+  background-color: #5bc0be;
+  text-align: center;
+  font-size: 1.1em;
+  z-index: 100;
+}
+
+.state > h1{
+  color: white;
+  font-size: 1.5em;
+}
+
 #info{
     font-size: 1.5em;
     color: #5bc0be;
@@ -27,25 +45,6 @@ input[type=text]{
     padding: 5px;
 }
 
-
-.state{
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 15vh;
-    background-color: #5bc0be;
-    text-align: center;
-    font-size: 1.1em;
-    z-index: 100;
-}
-
-.state > h1{
-    color: white;
-    font-size: 1.5em;
-}
-
 .waiting{
     display: flex;
     align-items: center;
@@ -53,24 +52,24 @@ input[type=text]{
     position: absolute;
     top: 0;
     left: 0;
-    background-color: rgba(0, 0, 0, 0.5);
     width: 100vw;
     height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
     text-align: center;
     color: azure;
     font-size: 2em;
 }
 
 button{
+  text-transform: uppercase;
+  font-size: 1.5em;
+  font-weight: bold;
+  border: 1px solid #5bc0be;
   width: 30%;
   height: 4vh;
   margin: 15px 0;
   background-color: #5bc0be;
   color:white;
-  text-transform: uppercase;
-  font-size: 1.5em;
-  font-weight: bold;
-  border: 1px solid #5bc0be;
 }
 
 #login {
@@ -79,9 +78,9 @@ button{
   top: 50%;
   left: 50%;
   border: 5px solid #5bc0be;
+  text-align: center;
   position: absolute;
   transform: translate(-300px, -200px);
-  text-align: center;
   z-index: 100;
 }
 
@@ -97,7 +96,6 @@ button{
     position: absolute;
     width: 300px;
     height: 300px;
-    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-100px, -100px);
