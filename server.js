@@ -5,7 +5,25 @@ const path = require("path")
 const qs = require("querystring")
 
 let players = [];
-let pawnsTab = []
+let pawnsTab = [];
+
+const update = (finish, res) => {
+    pawnsTab = JSON.parse(finish.data)
+    res.end("ok")
+}
+
+const compare = (finish, res) =>{
+    var obj = {}
+
+    if (finish.data === JSON.stringify(pawnsTab)) 
+        obj.changes = "false"
+    else {
+        obj.changes = "true"
+        obj.pawnsTab = pawnsTab
+    }
+
+    res.end(JSON.stringify(obj));
+}
 
 const addPlayer = (name) => {
     if(!players[0]){
@@ -24,7 +42,6 @@ const addPlayer = (name) => {
         return 'lack of space'
 }
 
-
 const reset = (res) => {
     players = []
     pawnsTab = [
@@ -38,26 +55,7 @@ const reset = (res) => {
         [1, 0, 1, 0, 1, 0, 1, 0]
     ]
 }
-resetBoard()
-
-const update = (finish, res) => {
-    pawnsTab = JSON.parse(finish.data)
-    res.end("ok")
-}
-
-const compare = (finish, res) =>{
-    var obj = {}
-
-    if (finish.data === JSON.stringify(pawnsTab)) 
-        obj.changes = "false"
-    else {
-        obj.changes = "true"
-        obj.pawnsTab = pawnsTab
-    }
-
-    res.end(JSON.stringify(obj))
-}
-
+reset()
 
 const serverres = (req, res) => {
     var allData = "";
@@ -66,15 +64,7 @@ const serverres = (req, res) => {
     })
     req.on("end", function (data) {
         var finish = qs.parse(allData)
-
         switch (finish.action) {
-            case "add":
-                res.end(addPlayer(finish.name))
-                break
-            case "reset":
-                reset(res)
-                res.end("ok")
-                break
             case "check":
                 res.end(players[1] ? players[1] : "")
                 break
@@ -83,6 +73,13 @@ const serverres = (req, res) => {
                 break
             case "compare":
                 compare(finish, res)
+                break
+            case "add":
+                res.end(addPlayer(finish.name))
+                break
+            case "reset":
+                reset(res)
+                res.end("ok")
                 break
         }
     })

@@ -5,7 +5,7 @@ class Ui{
 
     init(){
         game.changeCameraAngle("side");
-        $("#root").on("click", (event) => game.pick(event));
+        $("#root").on("click", (event) => game.choose(event));
         $("#reset").on("click", () => net.reset());
         $("#loginin").on("click", () => net.login());
     }

@@ -190,7 +190,7 @@ class Game{
     }
 
 
-    pick(event) {
+    choose(event) {
         this.mouseVector.x = (event.clientX / $(window).width()) * 2 - 1
         this.mouseVector.y = -(event.clientY / $(window).height()) * 2 + 1
         this.raycaster.setFromCamera(this.mouseVector, this.camera)
