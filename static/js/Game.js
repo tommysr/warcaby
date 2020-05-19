@@ -13,7 +13,7 @@ class Game{
 
         $("#root").append(this.renderer.domElement);
         this.render() 
-  
+  console.log("elo")
         this.szach =  [
             [1, 0, 1, 0, 1, 0, 1, 0],
             [0, 1, 0, 1, 0, 1, 0, 1],
