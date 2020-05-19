@@ -74,7 +74,6 @@ class Game{
 
         for (let i = 0; i < this.szach.length; i++) {
             for (let j = 0; j < this.szach[i].length; j++) {
-                console.log(j);
                 if (this.szach[i][j] == 0) {
                     var cube = new THREE.Mesh(box, material0);
                     cube.userData = { color: "black", x: i, y: j }
