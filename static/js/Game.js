@@ -74,6 +74,7 @@ class Game{
 
         for (let i = 0; i < this.szach.length; i++) {
             for (let j = 0; j < this.szach[i].length; j++) {
+                console.log(j);
                 if (this.szach[i][j] == 0) {
                     var cube = new THREE.Mesh(box, material0);
                     cube.userData = { color: "black", x: i, y: j }
@@ -123,7 +124,7 @@ class Game{
         this.raycaster.setFromCamera(this.mouseVector, this.camera)
         var intersects = this.raycaster.intersectObjects(this.scene.children)
 
-        if(intersects) {
+        if(intersects.length>0) {
             var el = intersects[0].object
 
             if (el.geometry.type == "CylinderGeometry") {
@@ -196,8 +197,6 @@ class Game{
                 zbijany.x = parseInt((el.userData.x + this.picked.userData.x) / 2)
                 zbijany.y = parseInt((el.userData.y + this.picked.userData.y) / 2)
 
-                console.log(zbijany)
-
                 if (this.pionki[zbijany.x][zbijany.y] == 1) {
                     this.pionki[zbijany.x][zbijany.y] = 0;
                     krok = true;
@@ -250,17 +249,16 @@ class Game{
 
 
     dajPionki(){
-        for (let i in this.szach.length)
-            for (let j in this.szach[0].length) {
-                let pion = null
-
+        for (let i = 0; i < this.szach.length; i++) 
+            for (let j = 0; j < this.szach[i].length; j++) {
+                let pion = null;
                 if (this.pionki[i][j] == 1) {
                     pion = new Pionek ("red");
                     pion.userData = { player: "player1", x: i, y: j }
                 }
                 else if (this.pionki[i][j] == 2) {
                     pion = new Pionek ("green");
-                    pion.userData = { player: "player2", x: i, y: j }
+                    pion.userData = { player: "player2", x: i, y: j };
                 }
 
                 if(pion){
