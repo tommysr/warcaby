@@ -9,7 +9,7 @@ class Game{
         this.raycaster = new THREE.Raycaster()
         this.mouseVector = new THREE.Vector2()
 
-        this.renderer.setClearColor(0x0066ff)
+        this.renderer.setClearColor(0x6d6875)
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         $("#root").append(this.renderer.domElement)
         this.render() 
@@ -28,9 +28,9 @@ class Game{
 
         this.sourceMaterial = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
-            color: 0xffff00,
+            color: 0x0c9ad9,
             transparent: true,
-            opacity: 1,
+            opacity: 0.4,
         })
 
         this.old_material
@@ -55,18 +55,18 @@ class Game{
             this.renderer.setSize(window.innerWidth, window.innerHeight)
         }
         
-        var box = new THREE.BoxGeometry(100, 25, 100)
+        var box = new THREE.BoxGeometry(100, 10, 100)
 
         var firstBoardMaterial = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
-            map: new THREE.TextureLoader().load('gfx/black.jpg'),
+            map: new THREE.TextureLoader().load('gfx/black.png'),
             transparent: true,
             opacity: 1,
         })
 
         var secondBoardMaterial = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
-            map: new THREE.TextureLoader().load('/gfx/white.jpg'),
+            map: new THREE.TextureLoader().load('/gfx/white.png'),
             transparent: true,
             opacity: 1,
         })
@@ -85,10 +85,7 @@ class Game{
                 cube.position.set(i * 100 - 350, 12.5, j * 100 - 350)
             }
         }
-
     }
-
-   
 
     changeCameraAngle(val) {
         let poz =val;
@@ -158,7 +155,6 @@ class Game{
 
 
     removePawn(x, y){
-
         for (let i = 0; i < this.scene.children.length; i++) 
             if (this.scene.children[i].userData.player == 'firstplayer' || this.scene.children[i].userData.player == 'secondplayer')
                 if(this.scene.children[i].userData.x == x && this.scene.children[i].userData.y == y) 
@@ -184,7 +180,6 @@ class Game{
                     this.removePawn(zbijany.x, zbijany.y)
                 }
             }
-            
         }
         else {
             if (el.userData.x - this.choosenPawn.userData.x == 1 && Math.abs(this.choosenPawn.userData.y - el.userData.y) == 1) 
@@ -210,53 +205,46 @@ class Game{
 
 
     pickUp(el){
-
-
         if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && this.isIt(el)) {
             this.pawns[this.choosenPawn.userData.x][this.choosenPawn.userData.y] = 0
 
             if (net.getState())
                 this.pawns[el.userData.x][el.userData.y] = net.getState() == 'firstplayer' ? 1 : 2
             
-
             this.choosenPawn.userData.x = el.userData.x
             this.choosenPawn.userData.y = el.userData.y
 
             this.choosenPawn.position.x = el.position.x
             this.choosenPawn.position.z = el.position.z
-            this.choosenPawn.position.y = 35
+            this.choosenPawn.position.y = 20
 
             this.choosenPawn.material = this.origin_material
             this.putDown()
 
             net.updateTabs(this.pawns)
         }
-        
-        
     }
-
 
     putDown(){
         this.choosenPawn = null
     }
-
 
     placePawns(){
         for (let i = 0; i < this.board.length; i++) 
             for (let j = 0; j < this.board[i].length; j++) {
                 let pion = null
                 if (this.pawns[i][j] == 1) {
-                    pion = new Pionek ("red")
+                    pion = new Pionek ("whitep")
                     pion.userData = { player: "firstplayer", x: i, y: j }
                 }
                 else if (this.pawns[i][j] == 2) {
-                    pion = new Pionek ("green")
+                    pion = new Pionek ("blackp")
                     pion.userData = { player: "secondplayer", x: i, y: j }
                 }
 
                 if(pion){
                     this.scene.add(pion)
-                    pion.position.set(i * 100 - 350, 35, j * 100 - 350)
+                    pion.position.set(i * 100 - 350, 20, j * 100 - 350)
                 }
             }
     }
