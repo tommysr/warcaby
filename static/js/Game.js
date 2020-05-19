@@ -74,6 +74,7 @@ class Game{
 
         for (let i = 0; i < this.szach.length; i++) {
             for (let j = 0; j < this.szach[i].length; j++) {
+                console.log(j);
                 if (this.szach[i][j] == 0) {
                     var cube = new THREE.Mesh(box, material0);
                     cube.userData = { color: "black", x: i, y: j }
@@ -123,7 +124,7 @@ class Game{
         this.raycaster.setFromCamera(this.mouseVector, this.camera)
         var intersects = this.raycaster.intersectObjects(this.scene.children)
 
-        if(intersects) {
+        if(intersects.length>0) {
             var el = intersects[0].object
 
             if (el.geometry.type == "CylinderGeometry") {
@@ -166,15 +167,15 @@ class Game{
 
 
     pickUp(el){
-
         var krok = 0
 
         if (net.get_stan() == "player1") {
             if (el.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) krok = 1
             if (el.userData.x - this.picked.userData.x == -2 && Math.abs(this.picked.userData.y - el.userData.y) == 2) {
-                var zbijany = {}
+                var zbijany = {};
                 zbijany.x = (el.userData.x + this.picked.userData.x) / 2
-                zbijany.y = (el.userData.y + this.picked.userData.y) / 2
+                zbijany.y = (el.userData.y + this.picked.userData.y) / 2;
+                
                 if (this.pionki[zbijany.x][zbijany.y] == 2) {
                     this.pionki[zbijany.x][zbijany.y] = 0
                     krok = 1
@@ -239,17 +240,16 @@ class Game{
     }
 
     dajPionki(){
-        for (let i in this.szach) 
-            for (let j in this.szach[0]) {
-                let pion = null
-
+        for (let i = 0; i < this.szach.length; i++) 
+            for (let j = 0; j < this.szach[i].length; j++) {
+                let pion = null;
                 if (this.pionki[i][j] == 1) {
                     pion = new Pionek ("red");
                     pion.userData = { player: "player1", x: i, y: j }
                 }
                 else if (this.pionki[i][j] == 2) {
                     pion = new Pionek ("green");
-                    pion.userData = { player: "player2", x: i, y: j }
+                    pion.userData = { player: "player2", x: i, y: j };
                 }
 
                 if(pion){
