@@ -162,7 +162,8 @@ class Game{
     }
 
     isEmpty(el){
-        return this.pionki[el.userData.x][el.userData.y] == 0
+        return this.pionki[el.userData.x][el.userData.y] == 0;;
+        console.log("i")
     }
 
     isIt(el){
