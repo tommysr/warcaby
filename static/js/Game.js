@@ -14,13 +14,13 @@ class Game{
         $("#root").append(this.renderer.domElement)
         this.render() 
 
-        this.szach =  []
+        this.board =  []
 
         for(let i = 0; i < 8; i++)
             if(i % 2)
-                this.szach.push([0, 1, 0, 1, 0, 1, 0, 1])
+                this.board.push([0, 1, 0, 1, 0, 1, 0, 1])
             else
-                this.szach.push([1, 0, 1, 0, 1, 0, 1, 0])
+                this.board.push([1, 0, 1, 0, 1, 0, 1, 0])
         
 
         this.pionki = [
@@ -71,13 +71,13 @@ class Game{
             opacity: 1,
         })
 
-        for (let i = 0; i < this.szach.length; i++) {
-            for (let j = 0; j < this.szach[i].length; j++) {
-                if (this.szach[i][j] == 0) {
+        for (let i = 0; i < this.board.length; i++) {
+            for (let j = 0; j < this.board[i].length; j++) {
+                if (this.board[i][j] == 0) {
                     var cube = new THREE.Mesh(box, material0)
                     cube.userData = { color: "black", x: i, y: j }
                 }
-                else if (this.szach[i][j] == 1) {
+                else if (this.board[i][j] == 1) {
                     var cube = new THREE.Mesh(box, material1)
                     cube.userData = { color: "white", x: i, y: j }
                 }
@@ -91,28 +91,6 @@ class Game{
     render(){
         requestAnimationFrame(this.render.bind(this))
         this.renderer.render(this.scene, this.camera)
-    }
-
-    setPoz(val) {
-        let poz = val
-        switch (poz) {
-            case "front":
-                this.camera.position.set(780, 400, 0)
-                this.camera.lookAt(this.scene.position)
-                break
-            case "back":
-                this.camera.position.set(-780, 400, 0)
-                this.camera.lookAt(this.scene.position)
-                break
-            case "top":
-                this.camera.position.set(0, 1000, 0)
-                this.camera.lookAt(this.scene.position)
-                break
-            case "side":
-                this.camera.position.set(0, 300, 1000)
-                this.camera.lookAt(this.scene.position)
-                break
-        }
     }
 
 
@@ -173,7 +151,7 @@ class Game{
     }
 
 
-    isIt(el){
+    canBeat(el){
         let krok = false
         if (net.state == 'player1') {
             if (el.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) 
@@ -219,7 +197,7 @@ class Game{
     pickUp(el){
 
 
-        if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && this.isIt(el)) {
+        if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && this.canBeat(el)) {
             this.pionki[this.picked.userData.x][this.picked.userData.y] = 0
 
             if (net.state)
@@ -248,9 +226,9 @@ class Game{
     }
 
 
-    dajPionki(){
-        for (let i = 0; i < this.szach.length; i++) 
-            for (let j = 0; j < this.szach[i].length; j++) {
+    addPawns(){
+        for (let i = 0; i < this.board.length; i++) 
+            for (let j = 0; j < this.board[i].length; j++) {
                 let pion = null
                 if (this.pionki[i][j] == 1) {
                     pion = new Pionek ("red")
@@ -268,13 +246,6 @@ class Game{
             }
     }
 
-    get_pionki(){
-        return this.pionki
-    }
-
-    set_pionki(pionki){
-        this.pionki = pionki
-    }
 
     refresh(){
         for(let i = 0; i < this.scene.children.length && this.scene.children[i]; i++)
@@ -283,6 +254,6 @@ class Game{
                 i--
             }
 
-        this.dajPionki()
+        this.addPawns()
     }
 }

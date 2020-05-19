@@ -3,7 +3,10 @@ class Net {
         this.waitForPlayer = {
             id: null,
             stop: function(){
+                if(!this.id) return
+
                 clearInterval(this.id)
+                this.id = null
             }
         }
         this.state
@@ -28,8 +31,11 @@ class Net {
                         $(".backgroundToMenu").click(function(event){
                             event.stopImmediatePropagation()
                         })
-                        game.setPoz("front")
-                        game.dajPionki()
+
+                        game.camera.position.set(780, 400, 0)
+                        game.camera.lookAt(game.scene.position)
+
+                        game.addPawns()
 
                         this.waitForPlayer.id = setInterval(() => { this.check() }, 500)
                         this.comparison= setInterval(() => this.compareTabs(), 1000)
@@ -44,8 +50,9 @@ class Net {
                         $(".backgroundToMenu").css("display", "none")
                         
                         
-                        game.setPoz("back")
-                        game.dajPionki()
+                        game.camera.position.set(-780, 400, 0)
+                        game.camera.lookAt(game.scene.position)
+                        game.addPawns()
 
                         this.comparison= setInterval(() => this.compareTabs(), 1000)
                         this.state = data
@@ -142,7 +149,7 @@ class Net {
             },
             error: function () {
                 console.log("error update")
-                this.updateTabs(game.get_pionki())
+                this.updateTabs(game.pionki)
             },
         })
     }
@@ -150,7 +157,7 @@ class Net {
     compareTabs(mode = false) {
         $.ajax({
             url: "/",
-            data: { action: "compare", data: JSON.stringify(game.get_pionki()) },
+            data: { action: "compare", data: JSON.stringify(game.pionki) },
             type: "POST",
             success: (data) => {
                 let obj = JSON.parse(data)
@@ -161,7 +168,7 @@ class Net {
                     if(mode)
                         $(".backgroundToMenu").css("display", "none")
                     
-                    game.set_pionki(obj.pionkiTab)
+                    game.pionki = obj.pionkiTab
                     game.refresh()
                 }
             },
@@ -170,7 +177,6 @@ class Net {
             },
         })
     }
-
 }
 
 

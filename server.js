@@ -58,10 +58,6 @@ function compare (finishObj, res){
 }
 
 
-function serverres(data, res){
-
-}
-
 var server = http.createServer(function (req, res) {
     switch (req.method) {
         case "GET":
