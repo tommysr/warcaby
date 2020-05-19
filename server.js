@@ -1,12 +1,11 @@
 const http = require("http")
-const qs = require("querystring")
 const fs = require("fs")
 const mime = require("mime-types")
 const path = require("path")
+const qs = require("querystring")
 
 let players = [];
 let pawnsTab = []
-
 
 const addPlayer = (name) => {
     if(!players[0]){
@@ -26,7 +25,7 @@ const addPlayer = (name) => {
 }
 
 
-const resetBoard = (res) => {
+const reset = (res) => {
     players = []
     pawnsTab = [
         [0, 2, 0, 2, 0, 2, 0, 2],
@@ -41,15 +40,15 @@ const resetBoard = (res) => {
 }
 resetBoard()
 
-const updateTab = (finishObj, res) => {
-    pawnsTab = JSON.parse(finishObj.data)
+const update = (finish, res) => {
+    pawnsTab = JSON.parse(finish.data)
     res.end("ok")
 }
 
-const compareTab = (finishObj, res) =>{
+const compare = (finish, res) =>{
     var obj = {}
 
-    if (finishObj.data === JSON.stringify(pawnsTab)) 
+    if (finish.data === JSON.stringify(pawnsTab)) 
         obj.changes = "false"
     else {
         obj.changes = "true"
@@ -66,24 +65,24 @@ const serverres = (req, res) => {
         allData += data
     })
     req.on("end", function (data) {
-        var finishObj = qs.parse(allData)
+        var finish = qs.parse(allData)
 
-        switch (finishObj.action) {
+        switch (finish.action) {
             case "add":
-                res.end(addPlayer(finishObj.name))
+                res.end(addPlayer(finish.name))
                 break
             case "reset":
-                resetBoard(res)
+                reset(res)
                 res.end("ok")
                 break
             case "check":
                 res.end(players[1] ? players[1] : "")
                 break
             case "update":
-                updateTab(finishObj, res)
+                update(finish, res)
                 break
             case "compare":
-                compareTab(finishObj, res)
+                compare(finish, res)
                 break
         }
     })
