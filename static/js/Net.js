@@ -15,15 +15,7 @@ class Net {
       success: (data) => {
         switch (data) {
           case "firstplayer":
-            //ui.firstPlayerUi(data, login);
-            $(".status").css("display", "block");
-            $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
-            $("#logindiv").css("display", "none");
-            
-            $(".lds-grid").css("display", "inline-block");
-            $(".backgroundToMenu").click(function(event){
-                event.stopImmediatePropagation();
-            });
+            ui.firstPlayerUi(data, login);
             game.changeCameraAngle("front");
             game.placePawns();
             this.waiting = setInterval(() => {
@@ -35,13 +27,7 @@ class Net {
             break;
 
           case "secondplayer":
-           // ui.secondPlayerUi(data, login);
-           $(".status").css("display", "block");
-           $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
-           $("#logindiv").css("display", "none");
-           $(".backgroundToMenu").css("display", "none");
-           
-           
+            ui.secondPlayerUi(data, login);
             game.changeCameraAngle("back");
             game.placePawns();
             this.comparing = setInterval(() => this.compareTabs(), 1000);
@@ -88,10 +74,7 @@ class Net {
       success: (data) => {
         if (data != "") {
           this.stop();
-            //ui.secondPlayerJoined(data);
-          $(".status").html(`${$(".status").html()}${data} joined to game (black pawns)`)
-        $(".lds-grid").css("display", "none");
-        $(".backgroundToMenu").css("display", "none");
+            ui.secondPlayerJoined(data);
         }
       },
       error: function (xhr, status, error) {
@@ -117,18 +100,12 @@ class Net {
       success: (data) => {
         if (data == "ok") {
           let i = 30;
-          //ui.showBlockScreen();
-          $(".backgroundToMenu").css("display", "block");
-          $(".backgroundToMenu").click(function(event){
-              event.stopImmediatePropagation();
-          });
+          ui.showBlockScreen();
           this.comparing = setInterval(() => {
             this.compareTabs(1);
-           // ui.updateCounter(i);
-           $(".backgroundToMenu").html(`<h1>${i}</h1>`);
+            ui.updateCounter(i);
             if (i == 0) {
-              //ui.hideBlockScreen();
-              $(".backgroundToMenu").css("display", "none");
+              ui.hideBlockScreen();
               clearInterval(this.comparing);
             }
             i--;
@@ -151,8 +128,7 @@ class Net {
         let obj = JSON.parse(data);
         if (obj.changes == "true") {
           if (mode == 1) {
-            $(".backgroundToMenu").css("display", "none");
-           // ui.hideBlockScreen();
+            ui.hideBlockScreen();
           }
           game.setPawns(obj.pawnsTab);
           game.refresh();

@@ -14,7 +14,7 @@ class Ui{
         $(".status").css("display", "block");
         $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
         $("#logindiv").css("display", "none");
-        $(".lds-grid").css("display", "inline-block");
+        $(".lds-spinner").css("display", "inline-block");
         $(".backgroundToMenu").click(function(event){
             event.stopImmediatePropagation();
         });
@@ -24,7 +24,7 @@ class Ui{
         $(".status").html(
             `${$(".status").html()}${data} joined to game (black pawns)`
           );
-          $(".lds-grid").css("display", "none");
+          $(".lds-spinner").css("display", "none");
           $(".backgroundToMenu").css("display", "none");
     }
 
