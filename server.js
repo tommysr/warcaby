@@ -11,18 +11,18 @@ let pawnsTab = []
 const addPlayer = (name) => {
     if(!players[0]){
         players[0] = name
-        return 'firstplayer'
+        return 'first player'
     }
     if(!players[1]){
         if(players[0] == name)
-            return 'existing'
+            return 'the given user already exists'
         else{
             players[1] = name
-            return 'secondplayer'
+            return 'second player'
         }
     }
     else
-        return 'toomany'
+        return 'lack of space'
 }
 
 

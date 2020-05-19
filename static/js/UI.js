@@ -6,52 +6,52 @@ class Ui{
     init(){
         game.changeCameraAngle("side");
         $("#root").on("click", (event) => game.pick(event));
-        $("#resetbutton").on("click", () => net.reset());
-        $("#loginbutton").on("click", () => net.login());
+        $("#reset").on("click", () => net.reset());
+        $("#loginin").on("click", () => net.login());
     }
 
     firstPlayerUi(data, login){
-        $(".status").css("display", "block");
-        $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
-        $("#logindiv").css("display", "none");
+        $(".state").css("display", "block");
+        $(".state").html(`<h1>${data}: ${login}</h1><p>connected to game - WHITE</p>`);
+        $("#login").css("display", "none");
         $(".lds-spinner").css("display", "inline-block");
-        $(".backgroundToMenu").click(function(event){
+        $(".waiting").click(function(event){
             event.stopImmediatePropagation();
         });
     }
 
     secondPlayerJoined(data){
-        $(".status").html(
-            `${$(".status").html()}${data} joined to game (black pawns)`
+        $(".state").html(
+            `${$(".state").html()}${data} joined to game - BLACK`
           );
           $(".lds-spinner").css("display", "none");
-          $(".backgroundToMenu").css("display", "none");
+          $(".waiting").css("display", "none");
     }
 
     secondPlayerUi(data, login){
-        $(".status").css("display", "block");
-        $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
-        $("#logindiv").css("display", "none");
-        $(".backgroundToMenu").css("display", "none");
+        $(".state").css("display", "block");
+        $(".state").html(`<h1>${data}: ${login}</h1><p>connected to game - BLACK</p>`);
+        $("#login").css("display", "none");
+        $(".waiting").css("display", "none");
     }
 
     showInfo(data){
-        $(".status").css("display", "block");
-        $(".status").html(`<h1>${data}</h1>`)
+        $(".state").css("display", "block");
+        $(".state").html(`<h1>${data}</h1>`)
     }
 
     showBlockScreen(){
-        $(".backgroundToMenu").css("display", "block");
-        $(".backgroundToMenu").click(function (event) {
+        $(".waiting").css("display", "flex");
+        $(".waiting").click(function (event) {
           event.stopImmediatePropagation();
         });
     }
 
     updateCounter(count){
-        $(".backgroundToMenu").html(`<h1>${count}</h1>`);
+        $(".waiting").html(`<h1>${count}</h1>`);
     }
 
     hideBlockScreen(){
-        $(".backgroundToMenu").css("display", "none");
+        $(".waiting").css("display", "none");
     }
 }

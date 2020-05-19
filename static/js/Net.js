@@ -7,14 +7,14 @@ class Net {
   }
 
   login() {
-    let login = $("#loginname").val();
+    let login = $("#name").val();
     $.ajax({
       url: "/",
       data: { action: "add", name: login },
       type: "POST",
       success: (data) => {
         switch (data) {
-          case "firstplayer":
+          case "first player":
             ui.firstPlayerUi(data, login);
             game.changeCameraAngle("front");
             game.placePawns();
@@ -26,7 +26,7 @@ class Net {
             this.myLogin = login;
             break;
 
-          case "secondplayer":
+          case "second player":
             ui.secondPlayerUi(data, login);
             game.changeCameraAngle("back");
             game.placePawns();
@@ -35,11 +35,11 @@ class Net {
             this.myLogin = login;
             break;
 
-          case "existing":
+          case "the given user already exists":
             ui.showInfo(data);
             break;
 
-          case "toomany":
+          case "lack of space":
             ui.showInfo(data);
             break;
         }

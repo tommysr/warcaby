@@ -155,7 +155,7 @@ class Game{
 
     removePawn(x, y){
         for (let i = 0; i < this.scene.children.length; i++) 
-            if (this.scene.children[i].userData.player == 'firstplayer' || this.scene.children[i].userData.player == 'secondplayer')
+            if (this.scene.children[i].userData.player == 'first player' || this.scene.children[i].userData.player == 'second player')
                 if(this.scene.children[i].userData.x == x && this.scene.children[i].userData.y == y) 
                     this.scene.remove(this.scene.children[i])
     }
@@ -163,7 +163,7 @@ class Game{
 
     isIt(el){
         let krok = false
-        if (net.getState() == 'firstplayer') {
+        if (net.getState() == 'first player') {
             if (el.userData.x - this.choosenPawn.userData.x == -1 && Math.abs(this.choosenPawn.userData.y - el.userData.y) == 1) 
                 krok = true
 
@@ -208,7 +208,7 @@ class Game{
             this.pawns[this.choosenPawn.userData.x][this.choosenPawn.userData.y] = 0
 
             if (net.getState())
-                this.pawns[el.userData.x][el.userData.y] = net.getState() == 'firstplayer' ? 1 : 2
+                this.pawns[el.userData.x][el.userData.y] = net.getState() == 'first player' ? 1 : 2
             
             this.choosenPawn.userData.x = el.userData.x
             this.choosenPawn.userData.y = el.userData.y
@@ -234,11 +234,11 @@ class Game{
                 let pion = null
                 if (this.pawns[i][j] == 1) {
                     pion = new Pionek ("whitep")
-                    pion.userData = { player: "firstplayer", x: i, y: j }
+                    pion.userData = { player: "first player", x: i, y: j }
                 }
                 else if (this.pawns[i][j] == 2) {
                     pion = new Pionek ("blackp")
-                    pion.userData = { player: "secondplayer", x: i, y: j }
+                    pion.userData = { player: "second player", x: i, y: j }
                 }
 
                 if(pion){
