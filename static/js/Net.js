@@ -1,167 +1,166 @@
 class Net {
-    constructor() {
-        this.czekaj;
-        this.stan;
-        this.mojlogin;
-        this.porownywanie;
-    }
-    
-    login(){
-        let login = $("#loginname").val()
-        $.ajax({
-            url: "/",
-            data: { action: "add", name: login },
-            type: "POST",
-            success: (data) => {
-                switch (data) {
-                    case "player1":
-                        $(".status").css("display", "block");
-                        $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
-                        $("#logindiv").css("display", "none");
-                        
-                        $(".lds-grid").css("display", "inline-block");
-                        $(".backgroundToMenu").click(function(event){
-                            event.stopImmediatePropagation();
-                        });
-                        game.setPoz("front");
-                        game.dajPionki()
+  constructor() {
+    this.waiting;
+    this.state;
+    this.myLogin;
+    this.comparing;
+  }
 
-                        this.czekaj = setInterval(() => { this.check() }, 500);
-                        this.porownywanie = setInterval(() => this.compareTabs(), 1000);
-                        this.stan = data;
-                        this.mojlogin = login;
-                        break
+  login() {
+    let login = $("#loginname").val();
+    $.ajax({
+      url: "/",
+      data: { action: "add", name: login },
+      type: "POST",
+      success: (data) => {
+        switch (data) {
+          case "firstplayer":
+            //ui.firstPlayerUi(data, login);
+            $(".status").css("display", "block");
+            $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
+            $("#logindiv").css("display", "none");
+            
+            $(".lds-grid").css("display", "inline-block");
+            $(".backgroundToMenu").click(function(event){
+                event.stopImmediatePropagation();
+            });
+            game.changeCameraAngle("front");
+            game.placePawns();
+            this.waiting = setInterval(() => {
+              this.check();
+            }, 500);
+            this.comparing = setInterval(() => this.compareTabs(), 1000);
+            this.state = data;
+            this.myLogin = login;
+            break;
 
-                    case "player2":
-                        $(".status").css("display", "block");
-                        $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
-                        $("#logindiv").css("display", "none");
-                        $(".backgroundToMenu").css("display", "none");
-                        
-                
-                        game.setPoz("back");
-                        game.dajPionki();
+          case "secondplayer":
+           // ui.secondPlayerUi(data, login);
+           $(".status").css("display", "block");
+           $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
+           $("#logindiv").css("display", "none");
+           $(".backgroundToMenu").css("display", "none");
+           
+           
+            game.changeCameraAngle("back");
+            game.placePawns();
+            this.comparing = setInterval(() => this.compareTabs(), 1000);
+            this.state = data;
+            this.myLogin = login;
+            break;
 
-                        this.porownywanie = setInterval(() => this.compareTabs(), 1000);
-                        this.stan = data;
-                        this.mojlogin = login;
-                        break;
+          case "existing":
+            ui.showInfo(data);
+            break;
 
-                    case "username taken":
-                        $(".status").css("display", "block");
-                        $(".status").html(`<h1>${data}</h1>`)
-                        break;
+          case "toomany":
+            ui.showInfo(data);
+            break;
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("error");
+      },
+    });
+  }
 
-                    case "no places left":
-                        $(".status").css("display", "block");
-                        $(".status").html(`<h1>${data}</h1>`)
-                        break;
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log("error")
-            },
-        });
-    }
+  reset() {
+    $.ajax({
+      url: "/",
+      data: { action: "reset" },
+      type: "POST",
+      success: (data) => {
+        if (data == "ok") {
+          location.reload();
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("error");
+      },
+    });
+  }
 
-    reset(){
-        $.ajax({
-            url: "/",
-            data: { action: "reset" },
-            type: "POST",
-            success: (data) => {
-                if (data == "ok") {
-                    location.reload()
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log("error")
-            },
-        });
-    }
+  check() {
+    $.ajax({
+      url: "/",
+      data: { action: "check" },
+      type: "POST",
+      success: (data) => {
+        if (data != "") {
+          this.stop();
+            //ui.secondPlayerJoined(data);
+          $(".status").html(`${$(".status").html()}${data} joined to game (black pawns)`)
+        $(".lds-grid").css("display", "none");
+        $(".backgroundToMenu").css("display", "none");
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("error");
+      },
+    });
+  }
 
-    check() {
-        $.ajax({
-            url: "/",
-            data: { action: "check" },
-            type: "POST",
-            success: (data) => {
-                if (data != "") {
-                    this.stop();
+  getState() {
+    return this.state;
+  }
 
-                    $(".status").html(`${$(".status").html()}${data} joined to game (black pawns)`)
-                    $(".lds-grid").css("display", "none");
-                    $(".backgroundToMenu").css("display", "none");
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log("error")
-            },
-        });
-    }
+  stop() {
+    clearInterval(this.waiting);
+  }
 
-    get_stan(){
-        return this.stan;
-    }
+  updateTabs(pawns) {
+    clearInterval(this.comparing);
+    $.ajax({
+      url: "/",
+      data: { action: "update", data: JSON.stringify(pawns) },
+      type: "POST",
+      success: (data) => {
+        if (data == "ok") {
+          let i = 30;
+          //ui.showBlockScreen();
+          $(".backgroundToMenu").css("display", "block");
+          $(".backgroundToMenu").click(function(event){
+              event.stopImmediatePropagation();
+          });
+          this.comparing = setInterval(() => {
+            this.compareTabs(1);
+           // ui.updateCounter(i);
+           $(".backgroundToMenu").html(`<h1>${i}</h1>`);
+            if (i == 0) {
+              //ui.hideBlockScreen();
+              $(".backgroundToMenu").css("display", "none");
+              clearInterval(this.comparing);
+            }
+            i--;
+          }, 1000);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("error");
+        this.updateTabs(game.getPawns());
+      },
+    });
+  }
 
-    stop() {
-        clearInterval(this.czekaj);
-    }
-
-    updateTabs(pionki){
-        clearInterval(this.porownywanie)
-        $.ajax({
-            url: "/",
-            data: { action: "update", data: JSON.stringify(pionki) },
-            type: "POST",
-            success: (data) => {
-                if (data == "ok") {
-                    let i = 30;
-                    $(".backgroundToMenu").css("display", "block");
-                    $(".backgroundToMenu").click(function(event){
-                        event.stopImmediatePropagation();
-                    });
-                    this.porownywanie = setInterval(() =>{
-                        this.compareTabs(1) 
-                        $(".backgroundToMenu").html(`<h1>${i}</h1>`);
-                        if(i==0){
-                            $(".backgroundToMenu").css("display", "none");
-                            clearInterval(this.porownywanie);
-                        }
-                        i--;
-                    }, 1000);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log("error")
-                this.updateTabs(game.get_pionki());
-            },
-        });
-    }
-
-    compareTabs(mode) {
-        $.ajax({
-            url: "/",
-            data: { action: "compare", data: JSON.stringify(game.get_pionki()) },
-            type: "POST",
-            success: (data) => {
-                let obj = JSON.parse(data);
-                if (obj.zmiany == "true") {
-                    if(mode==1){
-                        $(".backgroundToMenu").css("display", "none");
-                    }
-                    game.set_pionki(obj.pionkiTab);
-                    game.refresh();
-                }
-            },
-            error: function (xhr, status, error) {
-                console.log("error")
-            },
-        })
-    }
-
+  compareTabs(mode) {
+    $.ajax({
+      url: "/",
+      data: { action: "compare", data: JSON.stringify(game.getPawns()) },
+      type: "POST",
+      success: (data) => {
+        let obj = JSON.parse(data);
+        if (obj.changes == "true") {
+          if (mode == 1) {
+            $(".backgroundToMenu").css("display", "none");
+           // ui.hideBlockScreen();
+          }
+          game.setPawns(obj.pawnsTab);
+          game.refresh();
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log("error");
+      },
+    });
+  }
 }
-
-
-
-

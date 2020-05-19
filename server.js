@@ -5,31 +5,30 @@ const mime = require("mime-types")
 const path = require("path")
 
 let players = [];
-let pionkiTab = []
+let pawnsTab = []
 
 
 const addPlayer = (name) => {
-
     if(!players[0]){
         players[0] = name
-        return 'player1'
+        return 'firstplayer'
     }
     if(!players[1]){
         if(players[0] == name)
-            return 'username taken'
+            return 'existing'
         else{
             players[1] = name
-            return 'player2'
+            return 'secondplayer'
         }
     }
     else
-        return 'no places left'
+        return 'toomany'
 }
 
 
 const resetBoard = (res) => {
     players = []
-    pionkiTab = [
+    pawnsTab = [
         [0, 2, 0, 2, 0, 2, 0, 2],
         [2, 0, 2, 0, 2, 0, 2, 0],
         [0, 0, 0, 0, 0, 0, 0, 0],
@@ -43,18 +42,18 @@ const resetBoard = (res) => {
 resetBoard()
 
 const updateTab = (finishObj, res) => {
-    pionkiTab = JSON.parse(finishObj.data)
+    pawnsTab = JSON.parse(finishObj.data)
     res.end("ok")
 }
 
 const compareTab = (finishObj, res) =>{
     var obj = {}
 
-    if (finishObj.data === JSON.stringify(pionkiTab)) 
-        obj.zmiany = "false"
+    if (finishObj.data === JSON.stringify(pawnsTab)) 
+        obj.changes = "false"
     else {
-        obj.zmiany = "true"
-        obj.pionkiTab = pionkiTab
+        obj.changes = "true"
+        obj.pawnsTab = pawnsTab
     }
 
     res.end(JSON.stringify(obj))
@@ -90,10 +89,7 @@ const serverres = (req, res) => {
     })
 }
 
-var server = http.createServer(function (req, res) {
-    var req = req
-    var res = res
-
+const server = http.createServer(function (req, res) {
     switch (req.method) {
         case "GET":
             let url =
@@ -120,5 +116,5 @@ var server = http.createServer(function (req, res) {
 })
 
 server.listen(3000, function () {
-    console.log("serwer startuje na porcie 3000")
+    console.log("Starting on port: 3000")
 });

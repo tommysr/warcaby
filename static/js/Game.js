@@ -6,24 +6,16 @@ class Game{
             0.1,
             10000)
         this.renderer = new THREE.WebGLRenderer()
-        this.renderer.setClearColor(0x0066ff)
         this.raycaster = new THREE.Raycaster()
         this.mouseVector = new THREE.Vector2()
-        this.renderer.setSize(window.innerWidth, window.innerHeight)
 
+        this.renderer.setClearColor(0x0066ff)
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
         $("#root").append(this.renderer.domElement)
         this.render() 
-  
-        this.szach =  []
 
-        for(let i = 0; i < 8; i++)
-            if(i%2)
-                this.szach.push([0, 1, 0, 1, 0, 1, 0, 1])
-            else
-                this.szach.push([1, 0, 1, 0, 1, 0, 1, 0])
-        
-
-        this.pionki = [
+        this.board =  []
+        this.pawns = [
             [0, 2, 0, 2, 0, 2, 0, 2],
             [2, 0, 2, 0, 2, 0, 2, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -34,7 +26,7 @@ class Game{
             [1, 0, 1, 0, 1, 0, 1, 0],
         ]
 
-        this.picked_material = new THREE.MeshBasicMaterial({
+        this.sourceMaterial = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
             color: 0xffff00,
             transparent: true,
@@ -43,8 +35,16 @@ class Game{
 
         this.old_material
         this.old_picked
-        this.picked
+        this.choosenPawn
         this.orginal_material
+
+        for(let i = 0; i < 8; i++)
+            if(i%2)
+                this.board.push([0, 1, 0, 1, 0, 1, 0, 1])
+            else
+                this.board.push([1, 0, 1, 0, 1, 0, 1, 0])
+        
+      
         this.init()
     }
 
@@ -57,28 +57,28 @@ class Game{
         
         var box = new THREE.BoxGeometry(100, 25, 100)
 
-        var material0 = new THREE.MeshBasicMaterial({
+        var firstBoardMaterial = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
             map: new THREE.TextureLoader().load('gfx/black.jpg'),
             transparent: true,
             opacity: 1,
         })
 
-        var material1 = new THREE.MeshBasicMaterial({
+        var secondBoardMaterial = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
             map: new THREE.TextureLoader().load('/gfx/white.jpg'),
             transparent: true,
             opacity: 1,
         })
 
-        for (let i = 0; i < this.szach.length; i++) {
-            for (let j = 0; j < this.szach[i].length; j++) {
-                if (this.szach[i][j] == 0) {
-                    var cube = new THREE.Mesh(box, material0)
+        for (let i = 0; i < this.board.length; i++) {
+            for (let j = 0; j < this.board[i].length; j++) {
+                if (this.board[i][j] == 0) {
+                    var cube = new THREE.Mesh(box, firstBoardMaterial)
                     cube.userData = { color: "black", x: i, y: j }
                 }
-                else if (this.szach[i][j] == 1) {
-                    var cube = new THREE.Mesh(box, material1)
+                else if (this.board[i][j] == 1) {
+                    var cube = new THREE.Mesh(box, secondBoardMaterial)
                     cube.userData = { color: "white", x: i, y: j }
                 }
                 this.scene.add(cube)
@@ -88,28 +88,21 @@ class Game{
 
     }
 
-    render(){
-        requestAnimationFrame(this.render.bind(this))
-        this.renderer.render(this.scene, this.camera)
-    }
+   
 
-    setPoz(val) {
-        let poz = val
+    changeCameraAngle(val) {
+        let poz =val;
         switch (poz) {
             case "front":
-                this.camera.position.set(780, 400, 0)
+                this.camera.position.set(800, 500, 0)
                 this.camera.lookAt(this.scene.position)
                 break
             case "back":
-                this.camera.position.set(-780, 400, 0)
-                this.camera.lookAt(this.scene.position)
-                break
-            case "top":
-                this.camera.position.set(0, 1000, 0)
+                this.camera.position.set(-800, 500, 0)
                 this.camera.lookAt(this.scene.position)
                 break
             case "side":
-                this.camera.position.set(0, 300, 1000)
+                this.camera.position.set(0, 600, 700)
                 this.camera.lookAt(this.scene.position)
                 break
         }
@@ -127,25 +120,25 @@ class Game{
 
             if (el.geometry.type == "CylinderGeometry") {
 
-                if (el == this.picked) {
+                if (el == this.choosenPawn) {
                     el.material = this.origin_material
                     this.putDown()
                 }
-                else if (el.userData.player == net.get_stan()) {
-                    this.picked = el
+                else if (el.userData.player == net.getState()) {
+                    this.choosenPawn = el
 
                     if (this.old_picked) {
                         this.old_picked.material = this.origin_material
                     }
 
-                    this.origin_material = this.picked.material
-                    this.old_picked = this.picked
+                    this.origin_material = this.choosenPawn.material
+                    this.old_picked = this.choosenPawn
 
-                    this.picked.material = this.picked_material
+                    this.choosenPawn.material = this.sourceMaterial
                 }
             }
 
-            if (this.picked) 
+            if (this.choosenPawn) 
                 this.pickUp(el, intersects)
         }
     }
@@ -160,14 +153,14 @@ class Game{
     }
 
     isEmpty(el){
-        return this.pionki[el.userData.x][el.userData.y] == 0
+        return this.pawns[el.userData.x][el.userData.y] == 0
     }
 
 
     removePawn(x, y){
 
         for (let i = 0; i < this.scene.children.length; i++) 
-            if (this.scene.children[i].userData.player == 'player1' || this.scene.children[i].userData.player == 'player2')
+            if (this.scene.children[i].userData.player == 'firstplayer' || this.scene.children[i].userData.player == 'secondplayer')
                 if(this.scene.children[i].userData.x == x && this.scene.children[i].userData.y == y) 
                     this.scene.remove(this.scene.children[i])
     }
@@ -175,17 +168,17 @@ class Game{
 
     isIt(el){
         let krok = false
-        if (net.get_stan() == 'player1') {
-            if (el.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) 
+        if (net.getState() == 'firstplayer') {
+            if (el.userData.x - this.choosenPawn.userData.x == -1 && Math.abs(this.choosenPawn.userData.y - el.userData.y) == 1) 
                 krok = true
 
-            if (el.userData.x - this.picked.userData.x == -2 && Math.abs(this.picked.userData.y - el.userData.y) == 2) {
+            if (el.userData.x - this.choosenPawn.userData.x == -2 && Math.abs(this.choosenPawn.userData.y - el.userData.y) == 2) {
                 var zbijany = {}
-                zbijany.x = parseInt((el.userData.x + this.picked.userData.x) / 2)
-                zbijany.y = parseInt((el.userData.y + this.picked.userData.y) / 2)
+                zbijany.x = parseInt((el.userData.x + this.choosenPawn.userData.x) / 2)
+                zbijany.y = parseInt((el.userData.y + this.choosenPawn.userData.y) / 2)
 
-                if (this.pionki[zbijany.x][zbijany.y] == 2) {
-                    this.pionki[zbijany.x][zbijany.y] = 0
+                if (this.pawns[zbijany.x][zbijany.y] == 2) {
+                    this.pawns[zbijany.x][zbijany.y] = 0
                     krok = true
 
                     this.removePawn(zbijany.x, zbijany.y)
@@ -194,16 +187,16 @@ class Game{
             
         }
         else {
-            if (el.userData.x - this.picked.userData.x == 1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) 
+            if (el.userData.x - this.choosenPawn.userData.x == 1 && Math.abs(this.choosenPawn.userData.y - el.userData.y) == 1) 
                 krok = true
 
-            if (el.userData.x - this.picked.userData.x == 2 && Math.abs(this.picked.userData.y - el.userData.y) == 2) {
+            if (el.userData.x - this.choosenPawn.userData.x == 2 && Math.abs(this.choosenPawn.userData.y - el.userData.y) == 2) {
                 var zbijany = {}
-                zbijany.x = (el.userData.x + this.picked.userData.x) / 2
-                zbijany.y = (el.userData.y + this.picked.userData.y) / 2
+                zbijany.x = (el.userData.x + this.choosenPawn.userData.x) / 2
+                zbijany.y = (el.userData.y + this.choosenPawn.userData.y) / 2
 
-                if (this.pionki[zbijany.x][zbijany.y] == 1) {
-                    this.pionki[zbijany.x][zbijany.y] = 0
+                if (this.pawns[zbijany.x][zbijany.y] == 1) {
+                    this.pawns[zbijany.x][zbijany.y] = 0
                     krok = true
 
                     this.removePawn(zbijany.x, zbijany.y)
@@ -220,23 +213,23 @@ class Game{
 
 
         if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && this.isIt(el)) {
-            this.pionki[this.picked.userData.x][this.picked.userData.y] = 0
+            this.pawns[this.choosenPawn.userData.x][this.choosenPawn.userData.y] = 0
 
-            if (net.get_stan())
-                this.pionki[el.userData.x][el.userData.y] = net.get_stan() == 'player1' ? 1 : 2
+            if (net.getState())
+                this.pawns[el.userData.x][el.userData.y] = net.getState() == 'firstplayer' ? 1 : 2
             
 
-            this.picked.userData.x = el.userData.x
-            this.picked.userData.y = el.userData.y
+            this.choosenPawn.userData.x = el.userData.x
+            this.choosenPawn.userData.y = el.userData.y
 
-            this.picked.position.x = el.position.x
-            this.picked.position.z = el.position.z
-            this.picked.position.y = 35
+            this.choosenPawn.position.x = el.position.x
+            this.choosenPawn.position.z = el.position.z
+            this.choosenPawn.position.y = 35
 
-            this.picked.material = this.origin_material
+            this.choosenPawn.material = this.origin_material
             this.putDown()
 
-            net.updateTabs(this.pionki)
+            net.updateTabs(this.pawns)
         }
         
         
@@ -244,21 +237,21 @@ class Game{
 
 
     putDown(){
-        this.picked = null
+        this.choosenPawn = null
     }
 
 
-    dajPionki(){
-        for (let i = 0; i < this.szach.length; i++) 
-            for (let j = 0; j < this.szach[i].length; j++) {
+    placePawns(){
+        for (let i = 0; i < this.board.length; i++) 
+            for (let j = 0; j < this.board[i].length; j++) {
                 let pion = null
-                if (this.pionki[i][j] == 1) {
+                if (this.pawns[i][j] == 1) {
                     pion = new Pionek ("red")
-                    pion.userData = { player: "player1", x: i, y: j }
+                    pion.userData = { player: "firstplayer", x: i, y: j }
                 }
-                else if (this.pionki[i][j] == 2) {
+                else if (this.pawns[i][j] == 2) {
                     pion = new Pionek ("green")
-                    pion.userData = { player: "player2", x: i, y: j }
+                    pion.userData = { player: "secondplayer", x: i, y: j }
                 }
 
                 if(pion){
@@ -268,12 +261,12 @@ class Game{
             }
     }
 
-    get_pionki(){
-        return this.pionki
+    getPawns(){
+        return this.pawns
     }
 
-    set_pionki(pionki){
-        this.pionki = pionki
+    setPawns(pawns){
+        this.pawns = pawns
     }
 
     refresh(){
@@ -283,6 +276,11 @@ class Game{
                 i--
             }
 
-        this.dajPionki()
+        this.placePawns()
+    }
+
+    render(){
+        requestAnimationFrame(this.render.bind(this))
+        this.renderer.render(this.scene, this.camera)
     }
 }
