@@ -164,20 +164,20 @@ class Game{
         return this.pionki[el.userData.x][el.userData.y] == 0
     }
 
-
-    pickUp(el){
-
-        var krok = 0
-
+    isIt(el){
+        let krok = false
         if (net.get_stan() == "player1") {
-            if (el.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) krok = 1
+            if (el.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) krok = true
             if (el.userData.x - this.picked.userData.x == -2 && Math.abs(this.picked.userData.y - el.userData.y) == 2) {
                 var zbijany = {}
-                zbijany.x = (el.userData.x + this.picked.userData.x) / 2
-                zbijany.y = (el.userData.y + this.picked.userData.y) / 2
+                zbijany.x = parseInt((el.userData.x + this.picked.userData.x) / 2)
+                zbijany.y = parseInt((el.userData.y + this.picked.userData.y) / 2)
+
+                console.log(zbijany.x, zbijany.y)
+
                 if (this.pionki[zbijany.x][zbijany.y] == 2) {
                     this.pionki[zbijany.x][zbijany.y] = 0
-                    krok = 1
+                    krok = true
 
                     for (let i = 0; i < this.scene.children.length; i++) {
                         if (this.scene.children[i].userData.player == "player2" && this.scene.children[i].userData.x == zbijany.x && this.scene.children[i].userData.y == zbijany.y) {
@@ -190,14 +190,17 @@ class Game{
             
         }
         else {
-            if (el.userData.x - this.picked.userData.x == 1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) krok = 1;
+            if (el.userData.x - this.picked.userData.x == 1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) krok = true;
             if (el.userData.x - this.picked.userData.x == 2 && Math.abs(this.picked.userData.y - el.userData.y) == 2) {
                 var zbijany = {};
-                zbijany.x = (el.userData.x + this.picked.userData.x) / 2;
-                zbijany.y = (el.userData.y + this.picked.userData.y) / 2;
+                zbijany.x = parseInt((el.userData.x + this.picked.userData.x) / 2)
+                zbijany.y = parseInt((el.userData.y + this.picked.userData.y) / 2)
+
+                console.log(zbijany)
+
                 if (this.pionki[zbijany.x][zbijany.y] == 1) {
                     this.pionki[zbijany.x][zbijany.y] = 0;
-                    krok = 1;
+                    krok = true;
 
                     for (let i = 0; i < this.scene.children.length; i++) {
                         if (this.scene.children[i].userData.player == "player1" && this.scene.children[i].userData.x == zbijany.x && this.scene.children[i].userData.y == zbijany.y) {
@@ -209,8 +212,15 @@ class Game{
             }
         }
 
+        return krok
+    }
 
-        if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && krok) {
+
+
+    pickUp(el){
+
+
+        if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && this.isIt(el)) {
             this.pionki[this.picked.userData.x][this.picked.userData.y] = 0
 
             if (net.get_stan())
@@ -238,9 +248,10 @@ class Game{
         this.picked = null
     }
 
+
     dajPionki(){
-        for (let i in this.szach) 
-            for (let j in this.szach[0]) {
+        for (let i in this.szach.length)
+            for (let j in this.szach[0].length) {
                 let pion = null
 
                 if (this.pionki[i][j] == 1) {
