@@ -30,7 +30,7 @@ class Net {
                         this.porownywanie = setInterval(() => this.compareTabs(), 1000);
                         this.stan = data;
                         this.mojlogin = login;
-                        break;
+                        break
 
                     case "player2":
                         $(".status").css("display", "block");
