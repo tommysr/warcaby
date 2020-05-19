@@ -56,7 +56,7 @@ class Game{
         this.pawns = pawns
     }
 
-    putDown(){
+    clearChoosen(){
         this.choosenPawn = null
     }
 
@@ -75,6 +75,26 @@ class Game{
                 this.camera.lookAt(this.scene.position)
                 break
         }
+    }
+
+    placePawns(){
+        for (let i = 0; i < this.board.length; i++) 
+            for (let j = 0; j < this.board[i].length; j++) {
+                let pion = null
+                if (this.pawns[i][j] == 1) {
+                    pion = new Pionek ("whitep")
+                    pion.userData = { player: "first player", x: i, y: j }
+                }
+                else if (this.pawns[i][j] == 2) {
+                    pion = new Pionek ("blackp")
+                    pion.userData = { player: "second player", x: i, y: j }
+                }
+
+                if(pion){
+                    this.scene.add(pion)
+                    pion.position.set(i * 100 - 350, 20, j * 100 - 350)
+                }
+            }
     }
 
     init(){
@@ -121,19 +141,19 @@ class Game{
                     this.scene.remove(this.scene.children[i])
     }
 
-    isBox(el){
+    isBoxGeometry(el){
         return el.geometry.type == "BoxGeometry"
     }
 
-    isBlack(el){
+    isPlaceBlack(el){
         return el.userData.color == "black"
     }
 
-    isEmpty(el){
+    isPawnEmpty(el){
         return this.pawns[el.userData.x][el.userData.y] == 0
     }
 
-    isIt(el){
+    isPossibleToBeat(el){
         let krok = false
         if (net.getState() == 'first player') {
             if (el.userData.x - this.choosenPawn.userData.x == -1 && Math.abs(this.choosenPawn.userData.y - el.userData.y) == 1) 
@@ -171,8 +191,8 @@ class Game{
         return krok
     }
 
-    pickUp(el){
-        if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && this.isIt(el)) {
+    checkChoosen(el){
+        if (this.isBoxGeometry(el) && this.isPlaceBlack(el) && this.isPawnEmpty(el) && this.isPossibleToBeat(el)) {
             this.pawns[this.choosenPawn.userData.x][this.choosenPawn.userData.y] = 0
 
             if (net.getState())
@@ -184,7 +204,7 @@ class Game{
             this.choosenPawn.position.z = el.position.z
             this.choosenPawn.position.y = 20
             this.choosenPawn.material = this.materialOrigin
-            this.putDown()
+            this.clearChoosen()
             net.updateTabs(this.pawns)
         }
     }
@@ -201,7 +221,7 @@ class Game{
             if (el.geometry.type == "CylinderGeometry") {
                 if (el == this.choosenPawn) {
                     el.material = this.materialOrigin
-                    this.putDown()
+                    this.clearChoosen()
                 }
                 else if (el.userData.player == net.getState()) {
                     this.choosenPawn = el
@@ -214,29 +234,11 @@ class Game{
                 }
             }
             if (this.choosenPawn) 
-                this.pickUp(el, intersects)
+                this.checkChoosen(el, intersects)
         }
     }
 
-    placePawns(){
-        for (let i = 0; i < this.board.length; i++) 
-            for (let j = 0; j < this.board[i].length; j++) {
-                let pion = null
-                if (this.pawns[i][j] == 1) {
-                    pion = new Pionek ("whitep")
-                    pion.userData = { player: "first player", x: i, y: j }
-                }
-                else if (this.pawns[i][j] == 2) {
-                    pion = new Pionek ("blackp")
-                    pion.userData = { player: "second player", x: i, y: j }
-                }
 
-                if(pion){
-                    this.scene.add(pion)
-                    pion.position.set(i * 100 - 350, 20, j * 100 - 350)
-                }
-            }
-    }
 
     refresh(){
         for(let i = 0; i < this.scene.children.length && this.scene.children[i]; i++)
