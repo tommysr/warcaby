@@ -89,7 +89,7 @@ const serverres = (req, res) => {
     })
 }
 
-const server = http.createServer(function (req, res) {
+var server = http.createServer(function (req, res) {
     switch (req.method) {
         case "GET":
             let url =
