@@ -13,11 +13,11 @@ class Game{
 
         $("#root").append(this.renderer.domElement)
         this.render() 
-  
+
         this.szach =  []
 
         for(let i = 0; i < 8; i++)
-            if(i%2)
+            if(i % 2)
                 this.szach.push([0, 1, 0, 1, 0, 1, 0, 1])
             else
                 this.szach.push([1, 0, 1, 0, 1, 0, 1, 0])
@@ -36,7 +36,7 @@ class Game{
 
         this.picked_material = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
-            color: 0xffff00,
+            color: 0x30eeff,
             transparent: true,
             opacity: 1,
         })
@@ -131,7 +131,7 @@ class Game{
                     el.material = this.origin_material
                     this.putDown()
                 }
-                else if (el.userData.player == net.get_stan()) {
+                else if (el.userData.player == net.state) {
                     this.picked = el
 
                     if (this.old_picked) {
@@ -175,7 +175,7 @@ class Game{
 
     isIt(el){
         let krok = false
-        if (net.get_stan() == 'player1') {
+        if (net.state == 'player1') {
             if (el.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) 
                 krok = true
 
@@ -222,8 +222,8 @@ class Game{
         if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && this.isIt(el)) {
             this.pionki[this.picked.userData.x][this.picked.userData.y] = 0
 
-            if (net.get_stan())
-                this.pionki[el.userData.x][el.userData.y] = net.get_stan() == 'player1' ? 1 : 2
+            if (net.state)
+                this.pionki[el.userData.x][el.userData.y] = net.state == 'player1' ? 1 : 2
             
 
             this.picked.userData.x = el.userData.x

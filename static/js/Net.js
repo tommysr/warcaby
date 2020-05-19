@@ -1,9 +1,14 @@
 class Net {
     constructor() {
-        this.czekaj;
-        this.stan;
-        this.mojlogin;
-        this.porownywanie;
+        this.waitForPlayer = {
+            id: null,
+            stop: function(){
+                clearInterval(this.id)
+            }
+        }
+        this.state
+        this.userLogin
+        this.comparison
     }
     
     login(){
@@ -15,53 +20,53 @@ class Net {
             success: (data) => {
                 switch (data) {
                     case "player1":
-                        $(".status").css("display", "block");
-                        $(".status").html(`<h1>${data}: ${login}</h1><p>connected to game (white pawns)</p>`);
-                        $("#logindiv").css("display", "none");
+                        $(".status").css("display", "block")
+                        this.stat = `<h1>Nick gracza: ${login}</h1>Połączono(białe)`
+                        $(".status").html(this.stat)
+                        $("#login").css("display", "none")
                         
-                        $(".lds-grid").css("display", "inline-block");
                         $(".backgroundToMenu").click(function(event){
-                            event.stopImmediatePropagation();
-                        });
-                        game.setPoz("front");
+                            event.stopImmediatePropagation()
+                        })
+                        game.setPoz("front")
                         game.dajPionki()
 
-                        this.czekaj = setInterval(() => { this.check() }, 500);
-                        this.porownywanie = setInterval(() => this.compareTabs(), 1000);
-                        this.stan = data;
-                        this.mojlogin = login;
+                        this.waitForPlayer.id = setInterval(() => { this.check() }, 500)
+                        this.comparison= setInterval(() => this.compareTabs(), 1000)
+                        this.state = data
+                        this.userLogin = login
                         break
 
                     case "player2":
-                        $(".status").css("display", "block");
-                        $(".status").html(`<h1>${data}: ${login}</h1><p>connect to game (black pawns)</p>`);
-                        $("#logindiv").css("display", "none");
-                        $(".backgroundToMenu").css("display", "none");
+                        $(".status").css("display", "block")
+                        $(".status").html(`<h1>Nick gracza: ${login}</h1>Połączo(czarne)`)
+                        $("#login").css("display", "none")
+                        $(".backgroundToMenu").css("display", "none")
                         
-                
-                        game.setPoz("back");
-                        game.dajPionki();
+                        
+                        game.setPoz("back")
+                        game.dajPionki()
 
-                        this.porownywanie = setInterval(() => this.compareTabs(), 1000);
-                        this.stan = data;
-                        this.mojlogin = login;
-                        break;
+                        this.comparison= setInterval(() => this.compareTabs(), 1000)
+                        this.state = data
+                        this.userLogin = login
+                        break
 
                     case "username taken":
-                        $(".status").css("display", "block");
+                        $(".status").css("display", "block")
                         $(".status").html(`<h1>${data}</h1>`)
-                        break;
+                        break
 
                     case "no places left":
-                        $(".status").css("display", "block");
+                        $(".status").css("display", "block")
                         $(".status").html(`<h1>${data}</h1>`)
-                        break;
+                        break
                 }
             },
-            error: function (xhr, status, error) {
-                console.log("error")
+            error: function () {
+                console.log("error add")
             },
-        });
+        })
     }
 
     reset(){
@@ -74,10 +79,10 @@ class Net {
                     location.reload()
                 }
             },
-            error: function (xhr, status, error) {
+            error: function () {
                 console.log("error")
             },
-        });
+        })
     }
 
     check() {
@@ -87,76 +92,81 @@ class Net {
             type: "POST",
             success: (data) => {
                 if (data != "") {
-                    this.stop();
+                    this.waitForPlayer.stop()
 
-                    $(".status").html(`${$(".status").html()}${data} joined to game (black pawns)`)
-                    $(".lds-grid").css("display", "none");
-                    $(".backgroundToMenu").css("display", "none");
-                    $("#info").html(this.stan + ": " + this.mojlogin + "</br>Gracz 2 dołączył")
+                    $(".status").html(`${this.stat}<br/>${data} dołączył(czarne)`)
+                    $(".backgroundToMenu").css("display", "none")
                 }
             },
-            error: function (xhr, status, error) {
-                console.log("error")
+            error: function () {
+                console.error("error check")
             },
-        });
+        })
     }
 
-    get_stan(){
-        return this.stan;
+
+    block(){
+
+        $(".backgroundToMenu").html(`<h1>${this.time}</h1>`)
+
+        if(this.time <= 0)
+            $(".backgroundToMenu").css("display", "none")
+        else
+            $(".backgroundToMenu").css("display", "block")
     }
 
-    stop() {
-        clearInterval(this.czekaj);
-    }
 
     updateTabs(pionki){
-        clearInterval(this.porownywanie)
+        clearInterval(this.comparison)
         $.ajax({
             url: "/",
             data: { action: "update", data: JSON.stringify(pionki) },
             type: "POST",
             success: (data) => {
                 if (data == "ok") {
-                    let i = 30;
-                    $(".backgroundToMenu").css("display", "block");
+                    clearInterval(this.comparison)
+                    this.time = 30
+
                     $(".backgroundToMenu").click(function(event){
-                        event.stopImmediatePropagation();
-                    });
-                    this.porownywanie = setInterval(() =>{
-                        this.compareTabs(1) 
-                        $(".backgroundToMenu").html(`<h1>${i}</h1>`);
-                        if(i==0){
-                            $(".backgroundToMenu").css("display", "none");
-                            clearInterval(this.porownywanie);
-                        }
-                        i--;
-                    }, 1000);
+                        event.stopImmediatePropagation()
+                    })
+
+                    this.block()
+
+                    this.comparison= setInterval(() =>{
+                        this.compareTabs() 
+                        this.time--
+                        this.block()
+                    }, 1000)
                 }
             },
-            error: function (xhr, status, error) {
-                console.log("error")
-                this.updateTabs(game.get_pionki());
+            error: function () {
+                console.log("error update")
+                this.updateTabs(game.get_pionki())
             },
-        });
+        })
     }
 
-    compareTabs(mode) {
+    compareTabs(mode = false) {
         $.ajax({
             url: "/",
             data: { action: "compare", data: JSON.stringify(game.get_pionki()) },
             type: "POST",
             success: (data) => {
-                let obj = JSON.parse(data);
+                let obj = JSON.parse(data)
                 if (obj.zmiany == "true") {
-                    if(mode==1){
-                        $(".backgroundToMenu").css("display", "none");
-                    }
-                    game.set_pionki(obj.pionkiTab);
-                    game.refresh();
+                    this.time = 0
+                    this.block()
+
+                    if(mode)
+                        $(".backgroundToMenu").css("display", "none")
+                    
+                    game.set_pionki(obj.pionkiTab)
+                    game.refresh()
                 }
             },
-            error: function (xhr, status, error) {
-                console.log("error")
+            error: function () {
+                console.log("error compare")
             },
         })
     }
