@@ -152,14 +152,22 @@ class Game{
     }
 
 
+    isBox(el){
+        return el.geometry.type == "BoxGeometry"
+    }
+
+    isBlack(el){
+        return el.userData.color == "black"
+    }
+
+    isEmpty(el){
+        return this.pionki[el.userData.x][el.userData.y] == 0
+    }
+
+
     pickUp(el){
 
-
-        var geometry = 0, pole = 0, czyste = 0, krok = 0
-
-        if (el.geometry.type == "BoxGeometry") geometry = 1
-        if (el.userData.color == "black") pole = 1
-        if (this.pionki[el.userData.x][el.userData.y] == 0) czyste = 1
+        var krok = 0
 
         if (net.get_stan() == "player1") {
             if (el.userData.x - this.picked.userData.x == -1 && Math.abs(this.picked.userData.y - el.userData.y) == 1) krok = 1
@@ -202,7 +210,7 @@ class Game{
         }
 
 
-        if (geometry && pole && czyste && krok) {
+        if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && krok) {
             this.pionki[this.picked.userData.x][this.picked.userData.y] = 0
 
             if (net.get_stan())
@@ -260,7 +268,7 @@ class Game{
     }
 
     refresh(){
-        var c = 0;
+        let c = 0;
         while (this.scene.children[c]) {
             if (this.scene.children[c].geometry.type == "CylinderGeometry") {
                 this.scene.remove(this.scene.children[c])
