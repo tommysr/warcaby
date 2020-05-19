@@ -8,7 +8,7 @@ class Pionek extends THREE.Mesh {
     createMaterial(color){
         this.material = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
-            map: new THREE.TextureLoader().load(`/gfx/${color}.jpg`),
+            map: new THREE.TextureLoader().load(`/gfx/${color}.png`),
             transparent: true,
             opacity: 1,
         })

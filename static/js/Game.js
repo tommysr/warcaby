@@ -87,9 +87,8 @@ class Game{
         }
     }
 
-    changeCameraAngle(val) {
-        let poz =val;
-        switch (poz) {
+    changeCameraAngle(side) {
+        switch (side) {
             case "front":
                 this.camera.position.set(800, 500, 0)
                 this.camera.lookAt(this.scene.position)
