@@ -6,6 +6,68 @@ class Net {
     this.comparing;
   }
 
+  getState() {
+    return this.state;
+  }
+
+  stop() {
+    clearInterval(this.waiting);
+  }
+
+  reset() {
+    $.ajax({
+      url: "/",
+      data: { action: "reset" },
+      type: "POST",
+      success: (data) => {
+        if (data == "ok") {
+          location.reload();
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log(xhr);
+      },
+    });
+  }
+
+  check() {
+    $.ajax({
+      url: "/",
+      data: { action: "check" },
+      type: "POST",
+      success: (data) => {
+        if (data != "") {
+          this.stop();
+            ui.secondPlayerJoined(data);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log(xhr);
+      },
+    });
+  }
+
+  compareTabs(mode) {
+    $.ajax({
+      url: "/",
+      data: { action: "compare", data: JSON.stringify(game.getPawns()) },
+      type: "POST",
+      success: (data) => {
+        let obj = JSON.parse(data);
+        if (obj.changes == "true") {
+          if (mode == 1) {
+            ui.hideBlockScreen();
+          }
+          game.setPawns(obj.pawnsTab);
+          game.refresh();
+        }
+      },
+      error: function (xhr, status, error) {
+        console.log(xhr);
+      },
+    });
+  }
+
   login() {
     let login = $("#name").val();
     $.ajax({
@@ -45,50 +107,9 @@ class Net {
         }
       },
       error: function (xhr, status, error) {
-        console.log("error");
+        console.log(xhr);
       },
     });
-  }
-
-  reset() {
-    $.ajax({
-      url: "/",
-      data: { action: "reset" },
-      type: "POST",
-      success: (data) => {
-        if (data == "ok") {
-          location.reload();
-        }
-      },
-      error: function (xhr, status, error) {
-        console.log("error");
-      },
-    });
-  }
-
-  check() {
-    $.ajax({
-      url: "/",
-      data: { action: "check" },
-      type: "POST",
-      success: (data) => {
-        if (data != "") {
-          this.stop();
-            ui.secondPlayerJoined(data);
-        }
-      },
-      error: function (xhr, status, error) {
-        console.log("error");
-      },
-    });
-  }
-
-  getState() {
-    return this.state;
-  }
-
-  stop() {
-    clearInterval(this.waiting);
   }
 
   updateTabs(pawns) {
@@ -100,6 +121,7 @@ class Net {
       success: (data) => {
         if (data == "ok") {
           let i = 30;
+          ui.updateCounter("");
           ui.showBlockScreen();
           this.comparing = setInterval(() => {
             this.compareTabs(1);
@@ -113,29 +135,8 @@ class Net {
         }
       },
       error: function (xhr, status, error) {
-        console.log("error");
+        console.log(xhr);
         this.updateTabs(game.getPawns());
-      },
-    });
-  }
-
-  compareTabs(mode) {
-    $.ajax({
-      url: "/",
-      data: { action: "compare", data: JSON.stringify(game.getPawns()) },
-      type: "POST",
-      success: (data) => {
-        let obj = JSON.parse(data);
-        if (obj.changes == "true") {
-          if (mode == 1) {
-            ui.hideBlockScreen();
-          }
-          game.setPawns(obj.pawnsTab);
-          game.refresh();
-        }
-      },
-      error: function (xhr, status, error) {
-        console.log("error");
       },
     });
   }

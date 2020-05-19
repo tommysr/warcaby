@@ -33,10 +33,9 @@ class Game{
             opacity: 0.4,
         })
 
-        this.old_material
-        this.old_picked
+        this.choosenBefore
         this.choosenPawn
-        this.orginal_material
+        this.materialOrigin
 
         for(let i = 0; i < 8; i++)
             if(i%2)
@@ -48,6 +47,36 @@ class Game{
         this.init()
     }
 
+
+    getPawns(){
+        return this.pawns
+    }
+
+    setPawns(pawns){
+        this.pawns = pawns
+    }
+
+    putDown(){
+        this.choosenPawn = null
+    }
+
+    changeCameraAngle(side) {
+        switch (side) {
+            case "front":
+                this.camera.position.set(800, 500, 0)
+                this.camera.lookAt(this.scene.position)
+                break
+            case "back":
+                this.camera.position.set(-800, 500, 0)
+                this.camera.lookAt(this.scene.position)
+                break
+            case "side":
+                this.camera.position.set(0, 600, 700)
+                this.camera.lookAt(this.scene.position)
+                break
+        }
+    }
+
     init(){
         window.onresize = () => {
             this.camera.aspect = window.innerWidth / window.innerHeight
@@ -56,14 +85,12 @@ class Game{
         }
         
         var box = new THREE.BoxGeometry(100, 10, 100)
-
         var firstBoardMaterial = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
             map: new THREE.TextureLoader().load('gfx/black.png'),
             transparent: true,
             opacity: 1,
         })
-
         var secondBoardMaterial = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
             map: new THREE.TextureLoader().load('/gfx/white.png'),
@@ -87,58 +114,12 @@ class Game{
         }
     }
 
-    changeCameraAngle(side) {
-        switch (side) {
-            case "front":
-                this.camera.position.set(800, 500, 0)
-                this.camera.lookAt(this.scene.position)
-                break
-            case "back":
-                this.camera.position.set(-800, 500, 0)
-                this.camera.lookAt(this.scene.position)
-                break
-            case "side":
-                this.camera.position.set(0, 600, 700)
-                this.camera.lookAt(this.scene.position)
-                break
-        }
+    removePawn(x, y){
+        for (let i = 0; i < this.scene.children.length; i++) 
+            if (this.scene.children[i].userData.player == 'first player' || this.scene.children[i].userData.player == 'second player')
+                if(this.scene.children[i].userData.x == x && this.scene.children[i].userData.y == y) 
+                    this.scene.remove(this.scene.children[i])
     }
-
-
-    pick(event) {
-        this.mouseVector.x = (event.clientX / $(window).width()) * 2 - 1
-        this.mouseVector.y = -(event.clientY / $(window).height()) * 2 + 1
-        this.raycaster.setFromCamera(this.mouseVector, this.camera)
-        var intersects = this.raycaster.intersectObjects(this.scene.children)
-
-        if(intersects.length>0) {
-            var el = intersects[0].object
-
-            if (el.geometry.type == "CylinderGeometry") {
-
-                if (el == this.choosenPawn) {
-                    el.material = this.origin_material
-                    this.putDown()
-                }
-                else if (el.userData.player == net.getState()) {
-                    this.choosenPawn = el
-
-                    if (this.old_picked) {
-                        this.old_picked.material = this.origin_material
-                    }
-
-                    this.origin_material = this.choosenPawn.material
-                    this.old_picked = this.choosenPawn
-
-                    this.choosenPawn.material = this.sourceMaterial
-                }
-            }
-
-            if (this.choosenPawn) 
-                this.pickUp(el, intersects)
-        }
-    }
-
 
     isBox(el){
         return el.geometry.type == "BoxGeometry"
@@ -151,15 +132,6 @@ class Game{
     isEmpty(el){
         return this.pawns[el.userData.x][el.userData.y] == 0
     }
-
-
-    removePawn(x, y){
-        for (let i = 0; i < this.scene.children.length; i++) 
-            if (this.scene.children[i].userData.player == 'first player' || this.scene.children[i].userData.player == 'second player')
-                if(this.scene.children[i].userData.x == x && this.scene.children[i].userData.y == y) 
-                    this.scene.remove(this.scene.children[i])
-    }
-
 
     isIt(el){
         let krok = false
@@ -175,7 +147,6 @@ class Game{
                 if (this.pawns[zbijany.x][zbijany.y] == 2) {
                     this.pawns[zbijany.x][zbijany.y] = 0
                     krok = true
-
                     this.removePawn(zbijany.x, zbijany.y)
                 }
             }
@@ -192,7 +163,6 @@ class Game{
                 if (this.pawns[zbijany.x][zbijany.y] == 1) {
                     this.pawns[zbijany.x][zbijany.y] = 0
                     krok = true
-
                     this.removePawn(zbijany.x, zbijany.y)
                 }
             }
@@ -200,8 +170,6 @@ class Game{
 
         return krok
     }
-
-
 
     pickUp(el){
         if (this.isBox(el) && this.isBlack(el) && this.isEmpty(el) && this.isIt(el)) {
@@ -212,20 +180,42 @@ class Game{
             
             this.choosenPawn.userData.x = el.userData.x
             this.choosenPawn.userData.y = el.userData.y
-
             this.choosenPawn.position.x = el.position.x
             this.choosenPawn.position.z = el.position.z
             this.choosenPawn.position.y = 20
-
-            this.choosenPawn.material = this.origin_material
+            this.choosenPawn.material = this.materialOrigin
             this.putDown()
-
             net.updateTabs(this.pawns)
         }
     }
 
-    putDown(){
-        this.choosenPawn = null
+
+    pick(event) {
+        this.mouseVector.x = (event.clientX / $(window).width()) * 2 - 1
+        this.mouseVector.y = -(event.clientY / $(window).height()) * 2 + 1
+        this.raycaster.setFromCamera(this.mouseVector, this.camera)
+        var intersects = this.raycaster.intersectObjects(this.scene.children)
+
+        if(intersects.length>0) {
+            var el = intersects[0].object
+            if (el.geometry.type == "CylinderGeometry") {
+                if (el == this.choosenPawn) {
+                    el.material = this.materialOrigin
+                    this.putDown()
+                }
+                else if (el.userData.player == net.getState()) {
+                    this.choosenPawn = el
+                    if (this.choosenBefore) {
+                        this.choosenBefore.material = this.materialOrigin
+                    }
+                    this.materialOrigin = this.choosenPawn.material
+                    this.choosenBefore = this.choosenPawn
+                    this.choosenPawn.material = this.sourceMaterial
+                }
+            }
+            if (this.choosenPawn) 
+                this.pickUp(el, intersects)
+        }
     }
 
     placePawns(){
@@ -248,21 +238,12 @@ class Game{
             }
     }
 
-    getPawns(){
-        return this.pawns
-    }
-
-    setPawns(pawns){
-        this.pawns = pawns
-    }
-
     refresh(){
         for(let i = 0; i < this.scene.children.length && this.scene.children[i]; i++)
             if(this.scene.children[i].geometry.type == 'CylinderGeometry'){
                 this.scene.remove(this.scene.children[i])
                 i--
             }
-
         this.placePawns()
     }
 
